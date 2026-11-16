@@ -1,6 +1,6 @@
 # Bandeja
 
-A padel score keeper for the Garmin Forerunner 265 and 265S. One button press per point: the watch handles the rules (deuce modes, tie-breaks, serve rotation, change of ends) and saves the match to Garmin Connect as a real **Padel** activity, with heart rate, calories, training effect, the final score, one lap per game and the match stats.
+A padel score keeper for the Garmin Forerunner 265 and 265S. One button press per point: the watch handles the rules (deuce modes, tie-breaks, serve rotation, change of ends) and saves the match to Garmin Connect as a **Padel** activity, with heart rate, calories, training effect, the final score, one lap per game and the match stats.
 
 <!-- The Connect IQ store link goes here once the store listing is live. -->
 
