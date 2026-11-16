@@ -1,0 +1,27 @@
+<resources>
+    <!-- The FIT developer fields. Ids are the field numbers of source/recording/FitFields.mc:
+         never renumber or reuse one once released. Session 0-12, lap 13-16, record 17 (the chart in
+         our team color, `us`). -->
+    <fitContributions>
+        <fitField id="0" sortOrder="0" displayInActivitySummary="true" dataLabel="@Strings.FieldScore" unitLabel="@Strings.UnitSets"/>
+        <fitField id="1" sortOrder="1" displayInActivitySummary="true" precision="0" dataLabel="@Strings.FieldSetsWon" unitLabel="@Strings.UnitSets"/>
+        <fitField id="2" sortOrder="2" displayInActivitySummary="true" precision="0" dataLabel="@Strings.FieldSetsLost" unitLabel="@Strings.UnitSets"/>
+        <fitField id="3" sortOrder="3" displayInActivitySummary="true" precision="0" dataLabel="@Strings.FieldGamesWon" unitLabel="@Strings.UnitGames"/>
+        <fitField id="4" sortOrder="4" displayInActivitySummary="true" precision="0" dataLabel="@Strings.FieldGamesLost" unitLabel="@Strings.UnitGames"/>
+        <fitField id="5" sortOrder="5" displayInActivitySummary="true" precision="0" dataLabel="@Strings.FieldPointsWon" unitLabel="@Strings.UnitPoints"/>
+        <fitField id="6" sortOrder="6" displayInActivitySummary="true" precision="0" dataLabel="@Strings.FieldPointsLost" unitLabel="@Strings.UnitPoints"/>
+        <fitField id="7" sortOrder="7" displayInActivitySummary="true" precision="0" dataLabel="@Strings.FieldServeWon" unitLabel="@Strings.UnitPercent"/>
+        <fitField id="8" sortOrder="8" displayInActivitySummary="true" precision="0" dataLabel="@Strings.FieldReturnWon" unitLabel="@Strings.UnitPercent"/>
+        <fitField id="9" sortOrder="9" displayInActivitySummary="true" precision="0" dataLabel="@Strings.FieldBreaksWon" unitLabel="@Strings.UnitGames"/>
+        <fitField id="10" sortOrder="10" displayInActivitySummary="true" precision="0" dataLabel="@Strings.FieldResult" unitLabel="@Strings.UnitCode"/>
+        <fitField id="11" sortOrder="11" displayInActivitySummary="true" precision="0" dataLabel="@Strings.FieldDecidingWon" unitLabel="@Strings.UnitPoints"/>
+        <fitField id="12" sortOrder="12" displayInActivitySummary="true" precision="0" dataLabel="@Strings.FieldDecidingPlayed" unitLabel="@Strings.UnitPoints"/>
+
+        <fitField id="13" sortOrder="13" displayInActivityLaps="true" precision="0" dataLabel="@Strings.FieldLapSet" unitLabel="@Strings.UnitCode"/>
+        <fitField id="14" sortOrder="14" displayInActivityLaps="true" precision="0" dataLabel="@Strings.FieldLapScoreUs" unitLabel="@Strings.UnitCode"/>
+        <fitField id="15" sortOrder="15" displayInActivityLaps="true" precision="0" dataLabel="@Strings.FieldLapScoreThem" unitLabel="@Strings.UnitCode"/>
+        <fitField id="16" sortOrder="16" displayInActivityLaps="true" precision="0" dataLabel="@Strings.FieldLapOutcome" unitLabel="@Strings.UnitCode"/>
+
+        <fitField id="17" sortOrder="17" displayInChart="true" precision="0" chartTitle="@Strings.ChartMomentum" dataLabel="@Strings.FieldPointDifferential" unitLabel="@Strings.UnitPoints" fillColor="#33C3FF"/>
+    </fitContributions>
+</resources>

@@ -1,0 +1,55 @@
+<!-- The settings in the Garmin Connect app: every item of the on-watch Settings menu,
+     in its order and with its words, then the two team names, typed here only. The format, Indoor /
+     Outdoor and the timed match stay in the watch's Format menu. Each setting is the property of
+     properties.xml that the watch reads (Settings.mc), so a change here applies as one made on the
+     watch, also during a match (BandejaApp.onSettingsChanged()); a list stores its value as a Number,
+     the values the watch stores. -->
+<settings>
+    <setting propertyKey="@Properties.serveTracking" title="@Strings.MenuServeTracking">
+        <settingConfig type="boolean" />
+    </setting>
+    <setting propertyKey="@Properties.warmUp" title="@Strings.MenuWarmUp">
+        <settingConfig type="boolean" />
+    </setting>
+    <!-- VibrationSetting -->
+    <setting propertyKey="@Properties.vibration" title="@Strings.MenuVibration">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.VibrationEveryPoint</listEntry>
+            <listEntry value="1">@Strings.VibrationImportant</listEntry>
+            <listEntry value="2">@Strings.VibrationOff</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.sounds" title="@Strings.MenuSounds">
+        <settingConfig type="boolean" />
+    </setting>
+    <setting propertyKey="@Properties.changeOfEnds" title="@Strings.MenuChangeOfEnds">
+        <settingConfig type="boolean" />
+    </setting>
+    <setting propertyKey="@Properties.touchScoring" title="@Strings.MenuTouchScoring">
+        <settingConfig type="boolean" />
+    </setting>
+    <!-- The press delay in milliseconds (Settings.debounceChoices()) -->
+    <setting propertyKey="@Properties.debounce" title="@Strings.MenuDebounce">
+        <settingConfig type="list">
+            <listEntry value="500">@Strings.Debounce500</listEntry>
+            <listEntry value="800">@Strings.Debounce800</listEntry>
+            <listEntry value="1200">@Strings.Debounce1200</listEntry>
+        </settingConfig>
+    </setting>
+    <!-- ThemeSetting -->
+    <setting propertyKey="@Properties.theme" title="@Strings.MenuTheme">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.SettingThemeCourt</listEntry>
+            <listEntry value="1">@Strings.SettingThemeClay</listEntry>
+            <listEntry value="2">@Strings.SettingThemeGrass</listEntry>
+        </settingConfig>
+    </setting>
+    <!-- The team names: Settings.NAME_MAX characters, which the watch cuts to as well -->
+    <setting propertyKey="@Properties.teamNameUs" title="@Strings.SettingTeamUs" prompt="@Strings.SettingTeamUsPrompt">
+        <settingConfig type="alphaNumeric" maxLength="12" errorMessage="@Strings.SettingTeamError" />
+    </setting>
+    <setting propertyKey="@Properties.teamNameThem" title="@Strings.SettingTeamThem"
+            prompt="@Strings.SettingTeamThemPrompt">
+        <settingConfig type="alphaNumeric" maxLength="12" errorMessage="@Strings.SettingTeamError" />
+    </setting>
+</settings>

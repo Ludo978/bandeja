@@ -1,0 +1,4 @@
+{
+    "monkeyC.typeCheckLevel": "Strict",
+    "monkeyC.compilerWarnings": true
+}

@@ -1,0 +1,26 @@
+<!-- The settings, read and written by source/storage/Settings.mc, which holds the same
+     defaults. IDs and types are kept across versions: a value of another type reads as the default.
+     The format itself is in Application.Storage (FormatStore). settings.xml shows them in the Garmin
+     Connect app, all but Indoor / Outdoor and the timed match. -->
+<properties>
+    <property id="serveTracking" type="boolean">true</property>
+    <property id="warmUp" type="boolean">true</property>
+    <!-- VibrationSetting: 0 every point, 1 important only, 2 off -->
+    <property id="vibration" type="number">0</property>
+    <property id="sounds" type="boolean">false</property>
+    <!-- Indoor / Outdoor, picked in the Format menu -->
+    <property id="outdoor" type="boolean">false</property>
+    <!-- The timed match (court booking), picked in the Format menu -->
+    <property id="timedMatch" type="boolean">false</property>
+    <!-- The change of ends alert -->
+    <property id="changeOfEnds" type="boolean">true</property>
+    <!-- Touch scoring -->
+    <property id="touchScoring" type="boolean">false</property>
+    <!-- ThemeSetting: 0 Court, 1 Clay, 2 Grass -->
+    <property id="theme" type="number">0</property>
+    <!-- The press delay, in milliseconds: 500, 800 or 1200 -->
+    <property id="debounce" type="number">800</property>
+    <!-- The team names, typed in the Garmin Connect app only: empty shows US / THEM -->
+    <property id="teamNameUs" type="string"></property>
+    <property id="teamNameThem" type="string"></property>
+</properties>

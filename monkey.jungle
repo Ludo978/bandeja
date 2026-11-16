@@ -1,0 +1,6 @@
+project.manifest = manifest.xml
+
+# Only source/ (tests included, stripped from non-test builds by the (:test) annotation): the SDK's
+# default, ./**.mc, would also compile any other .mc file under the folder. resources/ is the default resource
+# path, and resources-fre/ is picked up for French.
+base.sourcePath = source

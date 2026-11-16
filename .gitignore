@@ -1,0 +1,20 @@
+# Build output
+bin/
+gen/
+*.prg
+*.iq
+
+# Signing key: never commit
+*.der
+*.pem
+developer_key*
+
+# Local project notes: kept on disk, not in the repo
+/SPEC.md
+/TASKS.md
+/docs/
+/spike/
+
+# OS / editor
+.DS_Store
+.claude/settings.local.json

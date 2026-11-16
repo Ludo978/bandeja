@@ -1,0 +1,321 @@
+<strings>
+    <string id="AppName" scope="glance">Bandeja</string>
+    <!-- The session's name, written in the FIT file: the native activity's name in the
+         watch's language. -->
+    <string id="ActivityName">Padel</string>
+    <!-- The START button's name, as printed by the button (the same in every language), first in
+         the hints "START · EXIT" and "START · BEGIN MATCH". -->
+    <string id="ButtonStart">START</string>
+
+    <!-- Session error screen -->
+    <string id="SessionErrorTitle">Can't record</string>
+    <string id="SessionErrorBody">The watch couldn't start a Padel activity. Nothing is recorded.</string>
+    <string id="HintExit">EXIT</string>
+
+    <!-- Home screen: the PLAY ball and the hint to the list below (Format, History,
+         Settings; the format shows right above it, so the hint names the other two). The format
+         lines come from the names below. Captions must fit the 360 px screen. -->
+    <string id="Play">PLAY</string>
+    <string id="HomeHint">HISTORY · SETTINGS</string>
+
+    <!-- Format names: the home line is "<sets> · <deuce mode>" (Tie-break only:
+         its name alone), the second line "[Singles · or Mixed · ]<court>". The Custom menu's Sets item
+         reuses the preset names. Free play: a match with no end, ended with End match. -->
+    <string id="PresetBestOf3">Best of 3</string>
+    <string id="PresetBestOf3SuperTb">Best of 3, super TB</string>
+    <string id="PresetOneSet">1 set</string>
+    <string id="PresetProSet">Pro set</string>
+    <string id="PresetShortSets">Short sets</string>
+    <string id="PresetBestOf5">Best of 5</string>
+    <string id="PresetTieBreak7">Tie-break to 7</string>
+    <string id="PresetTieBreak10">Tie-break to 10</string>
+    <string id="PresetFreePlay">Free play</string>
+    <string id="PresetCustom">Custom</string>
+    <string id="SetsBestOf5SuperTb">Best of 5, super TB</string>
+    <string id="DeuceAdvantage">Advantage</string>
+    <string id="DeuceGolden">Golden point</string>
+    <string id="DeuceStar">Star point</string>
+    <string id="DeuceSilver">Silver point</string>
+    <string id="Doubles">Doubles</string>
+    <string id="Singles">Singles</string>
+    <string id="Mixed">Mixed</string>
+    <string id="CourtIndoor">Indoor · no GPS</string>
+    <string id="CourtOutdoor">Outdoor · GPS</string>
+    <!-- A timed match: on the home screen's second line, before the court. -->
+    <string id="Timed">Timed</string>
+
+    <!-- Menus from the home screen. In the Custom menu, $1$ is a number of games
+         or points. -->
+    <string id="MenuFormat">Format</string>
+    <string id="MenuSettings">Settings</string>
+    <string id="MenuHistory">History</string>
+    <string id="MenuSets">Sets</string>
+    <string id="MenuDeuceMode">Deuce mode</string>
+    <string id="MenuPlayers">Players</string>
+    <string id="MenuCourt">Court</string>
+    <string id="MenuTimed">Timed match</string>
+    <string id="MenuGames">Games per set</string>
+    <string id="MenuTieBreak">Tie-break</string>
+    <string id="MenuTieBreakPoints">Tie-break to</string>
+    <string id="TieBreakAt">At $1$-$1$</string>
+    <string id="TieBreakNone">None</string>
+    <string id="TieBreakPoints">$1$ points</string>
+    <string id="MenuServeTracking">Serve tracking</string>
+    <string id="MenuWarmUp">Warm-up phase</string>
+    <string id="MenuVibration">Vibration</string>
+    <string id="VibrationEveryPoint">Every point</string>
+    <string id="VibrationImportant">Important only</string>
+    <string id="VibrationOff">Off</string>
+    <string id="MenuSounds">Sounds</string>
+    <string id="SoundsOn">Important events</string>
+    <string id="MenuChangeOfEnds">Change of ends alert</string>
+    <string id="MenuTouchScoring">Touch scoring</string>
+    <!-- The Press delay setting: the debounce, in seconds. -->
+    <string id="MenuDebounce">Press delay</string>
+    <string id="Debounce500">0.5 s</string>
+    <string id="Debounce800">0.8 s</string>
+    <string id="Debounce1200">1.2 s</string>
+    <!-- The Theme setting: its three names, each with its two colors under it, ours first. -->
+    <string id="MenuTheme">Theme</string>
+    <string id="ThemeCourt">Court</string>
+    <string id="ThemeClay">Clay</string>
+    <string id="ThemeGrass">Grass</string>
+    <string id="ThemeCourtColors">Cyan / orange</string>
+    <string id="ThemeClayColors">Sand / terracotta</string>
+    <string id="ThemeGrassColors">Green / violet</string>
+    <!-- The Garmin Connect app's settings (resources/settings/settings.xml): the on-watch items'
+         own strings, plus each theme's name with its colors in one line (a phone list has no line under
+         a choice), and the two team names, typed there only, with what Connect shows when one is typed
+         and when one is too long. Shown on the phone, not on the watch. -->
+    <string id="SettingThemeCourt">Court (cyan / orange)</string>
+    <string id="SettingThemeClay">Clay (sand / terracotta)</string>
+    <string id="SettingThemeGrass">Grass (green / violet)</string>
+    <string id="SettingTeamUs">Our team's name</string>
+    <string id="SettingTeamThem">Opponents' name</string>
+    <string id="SettingTeamUsPrompt">Shown on the match summary, 12 characters at most. Empty: US.</string>
+    <string id="SettingTeamThemPrompt">Shown on the match summary, 12 characters at most. Empty: THEM.</string>
+    <string id="SettingTeamError">12 characters at most</string>
+
+    <!-- Timed match: the court booking's end, asked at PLAY (a native list of clock times,
+         its title one line on the 360 px screen); the court time left under the warm-up's time and in
+         the data page's fourth cell; the toasts of the warnings and of the TIME alert; the net
+         banners ($1$ is the time left, "4:59"); the pause menu's items once the time is up, in place
+         of Resume and End match. Captions must fit the 360 px screen. -->
+    <string id="CourtEndsAt">Court ends at</string>
+    <string id="CourtLeft">COURT LEFT</string>
+    <string id="CourtTen">10 min left</string>
+    <string id="CourtFive">5 min left</string>
+    <string id="CourtTime">Time's up</string>
+    <string id="BannerTimeLeft">TIME LEFT $1$</string>
+    <string id="BannerTime">TIME</string>
+    <string id="MenuFinish">Finish</string>
+    <string id="MenuKeepPlaying">Keep playing</string>
+
+    <!-- Sensor lock and warm-up. The hint is "START · " then HintBeginMatch, or
+         WarmUp at the lock when the warm-up comes next. Captions must fit the 360 px screen. -->
+    <string id="WarmUp">WARM-UP</string>
+    <string id="LockReady">READY</string>
+    <string id="LockGps">SEARCHING GPS</string>
+    <string id="HintBeginMatch">BEGIN MATCH</string>
+    <string id="ToastPressStart">Press START to begin the match</string>
+    <string id="MenuStartMatch">Start match</string>
+
+    <!-- Serve questions, native menus at the match start. Opponent is the singles
+         answer. -->
+    <string id="ServeFirst">Who serves first?</string>
+    <string id="ServeFirstUs">Our first server?</string>
+    <string id="ServeMe">Me</string>
+    <string id="ServePartner">Partner</string>
+    <string id="ServeOpponents">Opponents</string>
+    <string id="ServeOpponent">Opponent</string>
+
+    <!-- Stop and discard (pause menu, summary, warm-up menu) -->
+    <string id="Resume">Resume</string>
+    <string id="Save">Save</string>
+    <string id="Discard">Discard</string>
+    <string id="DiscardConfirm">Discard this match?</string>
+    <string id="SaveFailed">Not saved</string>
+
+    <!-- Launch prompt when a match is stored, a native menu: Resume, with the score under
+         it, and Discard; the second title when the stored match can't be read (Discard only).
+         Titles must fit one line on the 360 px screen. -->
+    <string id="ResumeTitle">Resume match?</string>
+    <string id="ResumeFailedTitle">Can't resume</string>
+
+    <!-- Pause menu (START, titled ToastPaused) and match menu (hold UP, titled
+         AppName). Under Swap our server order: ServeMe or ServePartner; under Fix serving team:
+         TeamUs or TeamThem. SetWinner asks who gets a level set (End set now). Menu titles must fit
+         one line on the 360 px screen. -->
+    <string id="MenuEndMatch">End match</string>
+    <string id="MenuSwapServer">Swap our servers</string>
+    <string id="MenuFixServingTeam">Fix serving team</string>
+    <string id="MenuEndSet">End set now</string>
+    <string id="MenuDataPage">Data page</string>
+    <string id="MenuStatsPage">Stats page</string>
+    <string id="TeamUs">Us</string>
+    <string id="TeamThem">Them</string>
+    <string id="SetWinner">Who gets the set?</string>
+    <string id="Cancel">Cancel</string>
+
+    <!-- Edit score: the match menu's item, also the title of its menu. The menu's
+         items: EditSet ($1$ the set's number) for each finished set and the set in progress, EditGame
+         (MenuTieBreak in a tie-break, EditSuperTieBreak in the super tie-break), Add set, Remove set
+         ($1$ the last set's number), Apply, and EditNoChange under Apply when the score is the
+         match's own. The lists: a set's scores (EditEndedEarly under a set End set now gave), our
+         count then theirs for the games of the set in progress and a tie-break's points, the game's
+         points with EditDeuce ($1$ the deuce) or the deciding point's name under them. Labels, values
+         and titles must fit one line on the 360 px screen. -->
+    <string id="MenuEditScore">Edit score</string>
+    <string id="EditSet">Set $1$</string>
+    <string id="EditGame">Game</string>
+    <string id="EditSuperTieBreak">Super tie-break</string>
+    <string id="EditAddSet">Add set</string>
+    <string id="EditRemoveSet">Remove set $1$</string>
+    <string id="EditApply">Apply</string>
+    <string id="EditNoChange">No change</string>
+    <string id="EditEndedEarly">Ended early</string>
+    <string id="EditOurGames">Our games</string>
+    <string id="EditTheirGames">Their games</string>
+    <string id="EditOurPoints">Our points</string>
+    <string id="EditTheirPoints">Their points</string>
+    <string id="EditDeuce">Deuce $1$</string>
+
+    <!-- Score screen, partly also drawn by the debug design test screen.
+         Captions must fit the 360 px screen. PointsAd is the advantage in place of the points.
+         Banners sit on the net, one at a time: $1$ is the deuce count. Captions at the bottom: $1$
+         is the set number, or the tie-break points played at the next change of ends. ServerYou and
+         ServerPartner go under the mini court when our team serves. -->
+    <string id="Them">THEM</string>
+    <string id="Us">US</string>
+    <string id="PointsAd">AD</string>
+    <string id="BannerStarPoint">STAR POINT</string>
+    <string id="BannerSilverPoint">SILVER POINT</string>
+    <string id="BannerGoldenPoint">GOLDEN POINT</string>
+    <string id="BannerMatchPoint">MATCH POINT</string>
+    <string id="BannerSetPoint">SET POINT</string>
+    <string id="BannerBreakPoint">BREAK POINT</string>
+    <string id="BannerDeuce">DEUCE $1$</string>
+    <string id="BannerTieBreak">TIE-BREAK</string>
+    <string id="CaptionSet">SET $1$</string>
+    <string id="CaptionChangeEndsAt">CHANGE ENDS AT $1$</string>
+    <string id="CaptionReceiversChoose">RECEIVERS CHOOSE</string>
+    <string id="CaptionSameSexReceives">SAME SEX RECEIVES</string>
+    <string id="ServerYou">YOU</string>
+    <string id="ServerPartner">PARTNER</string>
+
+    <!-- Data page: the grid's labels under the elapsed time, the calories, this game's
+         duration and the time of day; under the heart rate, its zone ($1$, 1 to 5). Labels must
+         fit their cell on the 360 px screen. -->
+    <string id="DataElapsed">TIME</string>
+    <string id="DataCalories">KCAL</string>
+    <string id="DataGame">THIS GAME</string>
+    <string id="DataClock">TIME OF DAY</string>
+    <string id="DataZone">ZONE $1$</string>
+
+    <!-- Stats page: the label under the points won %, in our color; the grid's
+         labels under the serve points % (StatServe), the average time per point and our best
+         streak, which the summary's last page shows too. Labels must fit their cell on the 360 px
+         screen. -->
+    <string id="StatPointsWon">POINTS WON</string>
+    <string id="StatPerPoint">PER POINT</string>
+    <string id="StatStreak">BEST STREAK</string>
+
+    <!-- Game, set and match overlay: the word, between the context line (the
+         score screen's CaptionSet or BannerTieBreak, then the team) and the set's score; under
+         them, the change of ends pill when the players change ends after that game or set. -->
+    <string id="OverlayGame">GAME</string>
+    <string id="OverlaySet">SET</string>
+    <string id="OverlayMatch">MATCH</string>
+    <string id="OverlayChangeEnds">CHANGE ENDS</string>
+
+    <!-- Match summary: the result in the winner's color, the super tie-break's row in
+         the set table (the others are CaptionSet), the stats' labels under their values (KCAL is
+         DataCalories), and the hold UP menu's Back to match. Labels must fit their cell on the
+         360 px screen: the first page's grid cells are narrower than the later pages'. -->
+    <string id="SummaryWon">WON</string>
+    <string id="SummaryLost">LOST</string>
+    <string id="SummaryDraw">DRAW</string>
+    <string id="SummarySuperTb">SUPER TB</string>
+    <string id="StatDuration">DURATION</string>
+    <string id="StatAvgHr">AVG HR</string>
+    <string id="StatPoints">POINTS</string>
+    <string id="StatServe">SERVE PTS</string>
+    <string id="StatMaxHr">MAX HR</string>
+    <string id="StatGames">GAMES</string>
+    <string id="StatBreaks">BREAKS</string>
+    <string id="StatDeciding">DECIDING PTS</string>
+    <string id="StatTieBreaks">TIE-BREAKS</string>
+    <string id="StatBreakPointsWon">BREAK PTS WON</string>
+    <string id="StatBreakPointsSaved">BREAK PTS SAVED</string>
+    <string id="StatReturn">RETURN PTS</string>
+    <string id="StatLongestGame">LONGEST GAME</string>
+    <string id="MenuBackToMatch">Back to match</string>
+    <!-- A match saved unfinished (the pause menu's Save, the low battery save), as the history
+         shows its summary. -->
+    <string id="SummaryUnfinished">UNFINISHED</string>
+
+    <!-- History list, a native menu titled MenuHistory: each line's label is the result's
+         letter (none for a match saved unfinished) and the score, "W 6-4 6-3"; its sublabel the date
+         ($1$ the day, $2$ the month's short name as the watch writes it) and the duration ($1$ hours
+         and $2$ minutes, or $1$ minutes under an hour): "12 Nov · 1h12". HistoryEmpty is the one line
+         of an empty history. Lines must fit the 360 px screen. Those with scope="glance" are the
+         glance's too, which loads only these, with AppName for its title. -->
+    <string id="HistoryWon" scope="glance">W</string>
+    <string id="HistoryLost" scope="glance">L</string>
+    <string id="HistoryDraw" scope="glance">D</string>
+    <string id="HistoryDate">$1$ $2$</string>
+    <string id="HistoryHours" scope="glance">$1$h$2$</string>
+    <string id="HistoryMinutes" scope="glance">$1$ min</string>
+    <string id="HistoryEmpty" scope="glance">No matches yet</string>
+
+    <!-- Glance: the line under the title, $1$ the last saved match as the history list
+         writes it, then · and its duration: "Last: W 6-4 6-3 · 1h12". HistoryEmpty when no match
+         was saved yet. Must fit the glance's area of the 360 px screen (240 px). -->
+    <string id="GlanceLast" scope="glance">Last: $1$</string>
+
+    <!-- Score input: toasts the app draws on the net (never system
+         toasts). Undone names the event BACK took back. -->
+    <string id="UndonePointUs">Undone: point US</string>
+    <string id="UndonePointThem">Undone: point THEM</string>
+    <string id="UndoneServerSwap">Undone: server swap</string>
+    <string id="UndoneServingTeam">Undone: serving team</string>
+    <string id="UndoneDeuceMode">Undone: deuce mode</string>
+    <string id="UndoneEndSet">Undone: end set</string>
+    <string id="UndoneEndMatch">Undone: end match</string>
+    <string id="UndoneScoreEdit">Undone: score edit</string>
+    <string id="UndoneNothing">Nothing to undo</string>
+    <string id="ToastPaused">Paused</string>
+    <string id="ToastMatchOver">Match over</string>
+    <!-- A point refused: the match is as long as the watch keeps; End match or Save. -->
+    <string id="ToastMatchFull">Match too long</string>
+    <!-- The change of ends in a tie-break or the super tie-break, where no overlay shows. -->
+    <string id="ToastChangeEnds">Change ends</string>
+
+    <!-- FIT developer field labels and units, shown in Garmin Connect
+         (resources/fitcontributions/fitcontributions.xml). The lap's set score is the set's games,
+         or the super tie-break's points. -->
+    <string id="FieldScore">Score</string>
+    <string id="FieldSetsWon">Sets won</string>
+    <string id="FieldSetsLost">Sets lost</string>
+    <string id="FieldGamesWon">Games won</string>
+    <string id="FieldGamesLost">Games lost</string>
+    <string id="FieldPointsWon">Points won</string>
+    <string id="FieldPointsLost">Points lost</string>
+    <string id="FieldServeWon">Serve points won</string>
+    <string id="FieldReturnWon">Return points won</string>
+    <string id="FieldBreaksWon">Breaks won</string>
+    <string id="FieldResult">Result</string>
+    <string id="FieldDecidingWon">Deciding points won</string>
+    <string id="FieldDecidingPlayed">Deciding points played</string>
+    <string id="FieldLapSet">Set</string>
+    <string id="FieldLapScoreUs">Set score (us)</string>
+    <string id="FieldLapScoreThem">Set score (them)</string>
+    <string id="FieldLapOutcome">Game outcome</string>
+    <string id="FieldPointDifferential">Point differential</string>
+    <string id="ChartMomentum">Momentum</string>
+    <string id="UnitSets">sets</string>
+    <string id="UnitGames">games</string>
+    <string id="UnitPoints">pts</string>
+    <string id="UnitPercent">%</string>
+    <string id="UnitCode">#</string>
+</strings>

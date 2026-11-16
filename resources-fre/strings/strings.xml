@@ -1,0 +1,231 @@
+<strings>
+    <string id="AppName" scope="glance">Bandeja</string>
+    <string id="ActivityName">Padel</string>
+    <string id="ButtonStart">START</string>
+
+    <string id="SessionErrorTitle">Échec</string>
+    <string id="SessionErrorBody">La montre n'a pas pu lancer l'activité Padel. Rien n'est enregistré.</string>
+    <string id="HintExit">QUITTER</string>
+
+    <string id="Play">JOUER</string>
+    <string id="HomeHint">HISTORIQUE · PARAMÈTRES</string>
+
+    <string id="PresetBestOf3">2 sets gagnants</string>
+    <string id="PresetBestOf3SuperTb">2 sets + super TB</string>
+    <string id="PresetOneSet">1 set</string>
+    <string id="PresetProSet">Pro set</string>
+    <string id="PresetShortSets">Sets courts</string>
+    <string id="PresetBestOf5">3 sets gagnants</string>
+    <string id="PresetTieBreak7">Tie-break en 7</string>
+    <string id="PresetTieBreak10">Tie-break en 10</string>
+    <string id="PresetFreePlay">Partie libre</string>
+    <string id="PresetCustom">Personnalisé</string>
+    <string id="SetsBestOf5SuperTb">4 sets + super TB</string>
+    <string id="DeuceAdvantage">Avantage</string>
+    <string id="DeuceGolden">Point en or</string>
+    <string id="DeuceStar">Star point</string>
+    <string id="DeuceSilver">Silver point</string>
+    <string id="Doubles">Double</string>
+    <string id="Singles">Simple</string>
+    <string id="Mixed">Mixte</string>
+    <string id="CourtIndoor">Intérieur · sans GPS</string>
+    <string id="CourtOutdoor">Extérieur · GPS</string>
+    <string id="Timed">Minuté</string>
+
+    <string id="MenuFormat">Format</string>
+    <string id="MenuSettings">Paramètres</string>
+    <string id="MenuHistory">Historique</string>
+    <string id="MenuSets">Sets</string>
+    <string id="MenuDeuceMode">Égalité</string>
+    <string id="MenuPlayers">Joueurs</string>
+    <string id="MenuCourt">Terrain</string>
+    <string id="MenuTimed">Match minuté</string>
+    <string id="MenuGames">Jeux par set</string>
+    <string id="MenuTieBreak">Tie-break</string>
+    <string id="MenuTieBreakPoints">Tie-break en</string>
+    <string id="TieBreakAt">À $1$-$1$</string>
+    <string id="TieBreakNone">Aucun</string>
+    <string id="TieBreakPoints">$1$ points</string>
+    <string id="MenuServeTracking">Suivi du service</string>
+    <string id="MenuWarmUp">Échauffement</string>
+    <string id="MenuVibration">Vibration</string>
+    <string id="VibrationEveryPoint">À chaque point</string>
+    <string id="VibrationImportant">Événements clés</string>
+    <string id="VibrationOff">Désactivée</string>
+    <string id="MenuSounds">Sons</string>
+    <string id="SoundsOn">Événements clés</string>
+    <string id="MenuChangeOfEnds">Changement de côté</string>
+    <string id="MenuTouchScoring">Score tactile</string>
+    <string id="MenuDebounce">Délai entre appuis</string>
+    <string id="Debounce500">0,5 s</string>
+    <string id="Debounce800">0,8 s</string>
+    <string id="Debounce1200">1,2 s</string>
+    <string id="MenuTheme">Thème</string>
+    <string id="ThemeCourt">Classique</string>
+    <string id="ThemeClay">Terre battue</string>
+    <string id="ThemeGrass">Gazon</string>
+    <string id="ThemeCourtColors">Cyan / orange</string>
+    <string id="ThemeClayColors">Sable / terre cuite</string>
+    <string id="ThemeGrassColors">Vert / violet</string>
+    <string id="SettingThemeCourt">Classique (cyan / orange)</string>
+    <string id="SettingThemeClay">Terre battue (sable / terre cuite)</string>
+    <string id="SettingThemeGrass">Gazon (vert / violet)</string>
+    <string id="SettingTeamUs">Nom de notre équipe</string>
+    <string id="SettingTeamThem">Nom des adversaires</string>
+    <string id="SettingTeamUsPrompt">Affiché sur le résumé du match, 12 caractères au plus. Vide : NOUS.</string>
+    <string id="SettingTeamThemPrompt">Affiché sur le résumé du match, 12 caractères au plus. Vide : EUX.</string>
+    <string id="SettingTeamError">12 caractères au plus</string>
+
+    <string id="CourtEndsAt">Fin du créneau</string>
+    <string id="CourtLeft">TEMPS RESTANT</string>
+    <string id="CourtTen">Plus que 10 min</string>
+    <string id="CourtFive">Plus que 5 min</string>
+    <string id="CourtTime">Temps écoulé</string>
+    <string id="BannerTimeLeft">RESTE $1$</string>
+    <string id="BannerTime">TEMPS ÉCOULÉ</string>
+    <string id="MenuFinish">Terminer</string>
+    <string id="MenuKeepPlaying">Continuer</string>
+
+    <string id="WarmUp">ÉCHAUFFEMENT</string>
+    <string id="LockReady">PRÊT</string>
+    <string id="LockGps">RECHERCHE GPS</string>
+    <string id="HintBeginMatch">LANCER LE MATCH</string>
+    <string id="ToastPressStart">Appuyez sur START pour lancer le match</string>
+    <string id="MenuStartMatch">Lancer le match</string>
+
+    <string id="ServeFirst">Qui sert d'abord ?</string>
+    <string id="ServeFirstUs">Et pour nous ?</string>
+    <string id="ServeMe">Moi</string>
+    <string id="ServePartner">Partenaire</string>
+    <string id="ServeOpponents">Adversaires</string>
+    <string id="ServeOpponent">Adversaire</string>
+
+    <string id="Resume">Reprendre</string>
+    <string id="Save">Enregistrer</string>
+    <string id="Discard">Supprimer</string>
+    <string id="DiscardConfirm">Supprimer ce match ?</string>
+    <string id="SaveFailed">Non enregistré</string>
+
+    <string id="ResumeTitle">Match en cours</string>
+    <string id="ResumeFailedTitle">Match illisible</string>
+
+    <string id="MenuEndMatch">Terminer le match</string>
+    <string id="MenuSwapServer">Inverser serveurs</string>
+    <string id="MenuFixServingTeam">Équipe au service</string>
+    <string id="MenuEndSet">Terminer le set</string>
+    <string id="MenuDataPage">Données</string>
+    <string id="MenuStatsPage">Statistiques</string>
+    <string id="TeamUs">Nous</string>
+    <string id="TeamThem">Eux</string>
+    <string id="SetWinner">Set pour qui ?</string>
+    <string id="Cancel">Annuler</string>
+    <string id="MenuEditScore">Modifier le score</string>
+    <string id="EditSet">Set $1$</string>
+    <string id="EditGame">Jeu</string>
+    <string id="EditSuperTieBreak">Super tie-break</string>
+    <string id="EditAddSet">Ajouter un set</string>
+    <string id="EditRemoveSet">Retirer le set $1$</string>
+    <string id="EditApply">Valider</string>
+    <string id="EditNoChange">Aucun changement</string>
+    <string id="EditEndedEarly">Écourté</string>
+    <string id="EditOurGames">Nos jeux</string>
+    <string id="EditTheirGames">Leurs jeux</string>
+    <string id="EditOurPoints">Nos points</string>
+    <string id="EditTheirPoints">Leurs points</string>
+    <string id="EditDeuce">Égalité $1$</string>
+
+    <string id="Them">EUX</string>
+    <string id="Us">NOUS</string>
+    <string id="PointsAd">AV</string>
+    <string id="BannerStarPoint">STAR POINT</string>
+    <string id="BannerSilverPoint">SILVER POINT</string>
+    <string id="BannerGoldenPoint">POINT EN OR</string>
+    <string id="BannerMatchPoint">BALLE DE MATCH</string>
+    <string id="BannerSetPoint">BALLE DE SET</string>
+    <string id="BannerBreakPoint">BALLE DE BREAK</string>
+    <string id="BannerDeuce">ÉGALITÉ $1$</string>
+    <string id="BannerTieBreak">TIE-BREAK</string>
+    <string id="CaptionSet">SET $1$</string>
+    <string id="CaptionChangeEndsAt">CHANGEMENT À $1$</string>
+    <string id="CaptionReceiversChoose">RETOUR AU CHOIX</string>
+    <string id="CaptionSameSexReceives">RETOUR MÊME SEXE</string>
+    <string id="ServerYou">VOUS</string>
+    <string id="ServerPartner">PARTENAIRE</string>
+    <string id="DataElapsed">TEMPS</string>
+    <string id="DataCalories">KCAL</string>
+    <string id="DataGame">CE JEU</string>
+    <string id="DataClock">HEURE</string>
+    <string id="DataZone">ZONE $1$</string>
+    <string id="StatPointsWon">POINTS GAGNÉS</string>
+    <string id="StatPerPoint">PAR POINT</string>
+    <string id="StatStreak">MEILLEURE SÉRIE</string>
+    <string id="OverlayGame">JEU</string>
+    <string id="OverlaySet">SET</string>
+    <string id="OverlayMatch">MATCH</string>
+    <string id="OverlayChangeEnds">CHANGEZ DE CÔTÉ</string>
+    <string id="SummaryWon">GAGNÉ</string>
+    <string id="SummaryLost">PERDU</string>
+    <string id="SummaryDraw">MATCH NUL</string>
+    <string id="SummarySuperTb">SUPER TB</string>
+    <string id="StatDuration">DURÉE</string>
+    <string id="StatAvgHr">FC MOY</string>
+    <string id="StatPoints">POINTS</string>
+    <string id="StatServe">PTS SERVICE</string>
+    <string id="StatMaxHr">FC MAX</string>
+    <string id="StatGames">JEUX</string>
+    <string id="StatBreaks">BREAKS</string>
+    <string id="StatDeciding">PTS DÉCISIFS</string>
+    <string id="StatTieBreaks">TIE-BREAKS</string>
+    <string id="StatBreakPointsWon">BB CONVERTIES</string>
+    <string id="StatBreakPointsSaved">BB SAUVÉES</string>
+    <string id="StatReturn">PTS RETOUR</string>
+    <string id="StatLongestGame">PLUS LONG JEU</string>
+    <string id="MenuBackToMatch">Retour au match</string>
+    <string id="SummaryUnfinished">INACHEVÉ</string>
+    <string id="HistoryWon" scope="glance">V</string>
+    <string id="HistoryLost" scope="glance">D</string>
+    <string id="HistoryDraw" scope="glance">N</string>
+    <string id="HistoryDate">$1$ $2$</string>
+    <string id="HistoryHours" scope="glance">$1$h$2$</string>
+    <string id="HistoryMinutes" scope="glance">$1$ min</string>
+    <string id="HistoryEmpty" scope="glance">Aucun match</string>
+    <string id="GlanceLast" scope="glance">Dernier : $1$</string>
+    <string id="UndonePointUs">Annulé : point NOUS</string>
+    <string id="UndonePointThem">Annulé : point EUX</string>
+    <string id="UndoneServerSwap">Annulé : inversion serveurs</string>
+    <string id="UndoneServingTeam">Annulé : équipe au service</string>
+    <string id="UndoneDeuceMode">Annulé : mode d'égalité</string>
+    <string id="UndoneEndSet">Annulé : fin du set</string>
+    <string id="UndoneEndMatch">Annulé : fin du match</string>
+    <string id="UndoneScoreEdit">Annulé : score modifié</string>
+    <string id="UndoneNothing">Rien à annuler</string>
+    <string id="ToastPaused">En pause</string>
+    <string id="ToastMatchOver">Match terminé</string>
+    <string id="ToastMatchFull">Match trop long</string>
+    <string id="ToastChangeEnds">Changez de côté</string>
+
+    <string id="FieldScore">Score</string>
+    <string id="FieldSetsWon">Sets gagnés</string>
+    <string id="FieldSetsLost">Sets perdus</string>
+    <string id="FieldGamesWon">Jeux gagnés</string>
+    <string id="FieldGamesLost">Jeux perdus</string>
+    <string id="FieldPointsWon">Points gagnés</string>
+    <string id="FieldPointsLost">Points perdus</string>
+    <string id="FieldServeWon">Points gagnés au service</string>
+    <string id="FieldReturnWon">Points gagnés en retour</string>
+    <string id="FieldBreaksWon">Breaks réalisés</string>
+    <string id="FieldResult">Résultat</string>
+    <string id="FieldDecidingWon">Points décisifs gagnés</string>
+    <string id="FieldDecidingPlayed">Points décisifs joués</string>
+    <string id="FieldLapSet">Set</string>
+    <string id="FieldLapScoreUs">Score du set (nous)</string>
+    <string id="FieldLapScoreThem">Score du set (eux)</string>
+    <string id="FieldLapOutcome">Issue du jeu</string>
+    <string id="FieldPointDifferential">Écart de points</string>
+    <string id="ChartMomentum">Dynamique</string>
+    <string id="UnitSets">sets</string>
+    <string id="UnitGames">jeux</string>
+    <string id="UnitPoints">pts</string>
+    <string id="UnitPercent">%</string>
+    <string id="UnitCode">#</string>
+</strings>
