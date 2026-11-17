@@ -2,7 +2,7 @@
 
 A padel score keeper for the Garmin Forerunner 265 and 265S. One button press per point: the watch handles the rules (deuce modes, tie-breaks, serve rotation, change of ends) and saves the match to Garmin Connect as a **Padel** activity, with heart rate, calories, training effect, the final score, one lap per game and the match stats.
 
-<!-- The Connect IQ store link goes here once the store listing is live. -->
+**[Get it free on the Connect IQ store](https://apps.garmin.com/apps/eb45fd94-cf4e-4d44-aa3c-3322c38a6e2e)**
 
 <p>
   <img src="media/screen-1-home.png" width="160" alt="Home screen: PLAY, Best of 3, Star point">
