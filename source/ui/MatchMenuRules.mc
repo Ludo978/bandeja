@@ -75,7 +75,7 @@ class MatchMenuRules {
     // Data page / Stats page / Swap our server order / Fix serving team / Deuce mode / Edit score /
     // Vibration / Sounds / Touch scoring; Data page / Stats page / Vibration / Sounds / Touch scoring once
     // the match is over (the pages and the settings log nothing). Edit score is in this menu only, not
-    // the pause menu.
+    // the pause menu. Touch scoring only on a watch with a touchscreen (Settings.hasTouchScreen()).
     function getMatchItems() as Array<MatchMenuItem> {
         var items = [ITEM_DATA_PAGE, ITEM_STATS_PAGE] as Array<MatchMenuItem>;
         if (!isMatchOver() && !match.engine.isFull()) {
@@ -89,7 +89,9 @@ class MatchMenuRules {
         }
         items.add(ITEM_VIBRATION);
         items.add(ITEM_SOUNDS);
-        items.add(ITEM_TOUCH_SCORING);
+        if (Settings.hasTouchScreen()) {
+            items.add(ITEM_TOUCH_SCORING);
+        }
         return items;
     }
 

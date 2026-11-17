@@ -1,4 +1,5 @@
 import Toybox.Lang;
+import Toybox.System;
 import Toybox.Test;
 import Toybox.WatchUi;
 
@@ -226,6 +227,16 @@ function matchMenuSaveTest(logger as Logger) as Boolean {
     rig.play("u");
     Test.assert(rig.session.pause() && !rig.rules.save() && rig.session.isRecording() && rig.session.isPaused());
     Test.assert(rig.rules.resume() && !rig.session.isPaused() && !rig.rules.resume());
+    return true;
+}
+
+(:test)
+function matchMenuTouchScreenTest(logger as Logger) as Boolean {
+    // Touch scoring is in the match menu on a watch with a touchscreen only, as monkey.jungle builds
+    // it for each watch. The simulators run with touch on, so it matches the device file there.
+    Test.assertEqual(Settings.hasTouchScreen(), System.getDeviceSettings().isTouchScreen);
+    var rig = new TestKit.Rig(new MatchConfig(), "", false);
+    Test.assertEqual(rig.rules.getMatchItems().indexOf(ITEM_TOUCH_SCORING) >= 0, Settings.hasTouchScreen());
     return true;
 }
 

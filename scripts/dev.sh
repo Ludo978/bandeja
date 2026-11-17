@@ -242,6 +242,10 @@ base.sourcePath = ../../source
 base.resourcePath = ../../resources;resources
 base.lang.fre = ../../resources-fre;resources-fre
 JUNGLE
+        # monkey.jungle's device lines: the extra source and resource folders (launcher icon sizes,
+        # bundled fonts), seen from bin/beta, and the code left out per watch.
+        sed -E -n -e 's#^([a-z0-9]+\.(resource|source)Path = \$\([a-z0-9]+\.(resource|source)Path\));(.*)$#\1;../../\4#p' \
+            -e '/^[a-z0-9]+\.excludeAnnotations = /p' "$PROJECT/monkey.jungle" >>"$beta/monkey.jungle"
         JUNGLE="$beta/monkey.jungle"
         compile -e -r -o "$OUT/$NAME-beta.iq"
         echo "Beta package: $OUT/$NAME-beta.iq (app ID $BETA_ID)"

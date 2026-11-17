@@ -191,19 +191,27 @@ function glanceSizeTest(logger as Logger) as Boolean {
     var width = area[0];
     var height = area[1];
     var dc = (Graphics.createBufferedBitmap({:width => width, :height => height}).get() as Graphics.BufferedBitmap).getDc();
-    var scale = height / BandejaGlance.HEIGHT;
-    var title = BandejaGlance.font(BandejaGlance.TITLE_SIZE * scale);
+    var scale = BandejaGlance.scale(height);
+    var top = BandejaGlance.top(height);
+    // On the FR265 and FR265S the glance font is the mockup's title scaled to the area's height, so the
+    // mockup fills the area from its top. Elsewhere it never grows past the height, centered in it.
+    if (width == 275 || width == 240) {
+        Test.assert(scale == height / BandejaGlance.HEIGHT && top == 0.0);
+    }
+    Test.assert(scale <= height / BandejaGlance.HEIGHT && top >= 0.0);
+    var title = BandejaGlance.titleFont();
     Test.assertEqual(Graphics.getFontHeight(title), Graphics.getFontHeight(Graphics.FONT_GLANCE));
     var name = GlanceTests.text(Rez.Strings.AppName);
     Test.assert(dc.getTextWidthInPixels(name, title) <= width);
-    Test.assert(BandejaGlance.TITLE_BASELINE * scale - Graphics.getFontAscent(title) >= 0);
+    var titleBaseline = top + BandejaGlance.TITLE_BASELINE * scale;
+    Test.assert(titleBaseline - Graphics.getFontAscent(title) >= 0);
     var size = BandejaGlance.LINE_SIZE * scale;
     var line = BandejaGlance.font(size);
     // The line's capitals start below the title's descender (the j of Bandeja), and its descenders
     // ("yet") end in the area.
-    Test.assert((BandejaGlance.LINE_BASELINE - Fonts.CAP_MIDDLE * 2 * BandejaGlance.LINE_SIZE) * scale
-        > BandejaGlance.TITLE_BASELINE * scale + Graphics.getFontDescent(title));
-    Test.assert(BandejaGlance.LINE_BASELINE * scale + Graphics.getFontDescent(line) <= height);
+    Test.assert(top + (BandejaGlance.LINE_BASELINE - Fonts.CAP_MIDDLE * 2 * BandejaGlance.LINE_SIZE) * scale
+        > titleBaseline + Graphics.getFontDescent(title));
+    Test.assert(top + BandejaGlance.LINE_BASELINE * scale + Graphics.getFontDescent(line) <= height);
     // The lines as LastMatch writes them in either language (checked against the language running),
     // then what the glance shows of them: whole at full size (0), the score at full size or smaller
     // (1), the sets won (2), or either as long as it fits (3).
@@ -233,11 +241,13 @@ function glanceSizeTest(logger as Logger) as Boolean {
         [["No matches yet"], 0],
         [["Aucun match"], 0]
     ];
+    // The line keeps clear of the Instinct 3 AMOLED's window (lineWidth()): there it only has to fit.
+    var lineWidth = BandejaGlance.lineWidth(dc);
     for (var i = 0; i < cases.size(); i++) {
         var lines = cases[i][0] as Array<String>;
-        var shown = cases[i][1] as Number;
+        var shown = lineWidth == width ? cases[i][1] as Number : 3;
         var fitted = BandejaGlance.fit(dc, lines, size);
-        Test.assertMessage(dc.getTextWidthInPixels(lines[fitted[0]], fitted[2]) <= width, "case " + i);
+        Test.assertMessage(dc.getTextWidthInPixels(lines[fitted[0]], fitted[2]) <= lineWidth, "case " + i);
         if (shown == 0) {
             Test.assertMessage(fitted[0] == 0 && fitted[1] == size, "case " + i);
         } else if (shown == 1) {
@@ -283,10 +293,15 @@ module GlanceTests {
         return Lang.format(text(Rez.Strings.GlanceLast), [shown]);
     }
 
-    // The area the watch gives the glance on this screen, width and height (the device files'
-    // glance content area): the FR265's, or the FR265S's on its 360 px screen.
+    // The area the watch gives the glance, width and height (the device files' glance content area),
+    // by the watch's part number: the FR265S, Forerunner 165, FR265, Forerunner 965, fenix 9 Pro 51 mm,
+    // Descent G2, Instinct 3 AMOLED 45 mm and 50 mm; the FR265's on another watch.
     function area() as [Number, Number] {
-        return System.getDeviceSettings().screenWidth == 360 ? [240, 104] : [275, 120];
+        var areas = {"006-B4258-00" => [240, 104], "006-B4432-00" => [261, 124], "006-B4257-00" => [275, 120],
+            "006-B4315-00" => [299, 148], "006-B4954-00" => [359, 130], "006-B4588-00" => [248, 103],
+            "006-B4586-00" => [320, 99], "006-B4587-00" => [346, 106]} as Dictionary<String, [Number, Number]>;
+        var area = areas[System.getDeviceSettings().partNumber];
+        return area != null ? area : [275, 120];
     }
 
     // The lines as one string, to compare them.

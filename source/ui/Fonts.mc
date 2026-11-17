@@ -13,9 +13,11 @@ enum FontStyle {
 }
 
 // Fonts by style and em size, loaded once and kept: a vector font is expensive to load, so never
-// per frame. The FR265 and FR265S have RobotoCondensedBold (STYLE_NUMBER, STYLE_BOLD) and
-// RobotoCondensedRegular (STYLE_REGULAR) as scalable fonts from API 4.2.1. Without them (the FR265
-// launched with 4.2.0), each size falls back to the system font closest in height.
+// per frame. The watches have RobotoCondensedBold (STYLE_NUMBER, STYLE_BOLD) and
+// RobotoCondensedRegular (STYLE_REGULAR) as scalable fonts from API 4.2.1, but for the Descent G2 and
+// the Instinct 3 AMOLED, which have none: their builds bundle the same faces as bitmap fonts
+// (BundledFonts, from bundled-fonts/), and each size takes the bundled size nearest to it. Without
+// either (the FR265 launched with 4.2.0), each size falls back to the system font closest in height.
 module Fonts {
 
     const FACE_BOLD = "RobotoCondensedBold";
@@ -64,12 +66,28 @@ module Fonts {
                 return font;
             }
         }
+        var font = bundled(style, size);
+        if (font != null) {
+            return font;
+        }
         var fonts = fallbacks(style);
         var heights = new Array<Number>[fonts.size()];
         for (var i = 0; i < fonts.size(); i++) {
             heights[i] = Graphics.getFontHeight(fonts[i]);
         }
         return fonts[nearest(height, heights)];
+    }
+
+    // The bundled font nearest to an em size, on the watches built with them (monkey.jungle); null on
+    // the others, whose builds leave BundledFonts out.
+    (:bundledFonts)
+    function bundled(style as FontStyle, size as Number) as Graphics.FontType? {
+        return BundledFonts.get(style, size);
+    }
+
+    (:noBundledFonts)
+    function bundled(style as FontStyle, size as Number) as Graphics.FontType? {
+        return null;
     }
 
     // The line height of an em size, getVectorFont's :size.

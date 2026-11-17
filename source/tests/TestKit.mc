@@ -1333,7 +1333,12 @@ module TestKit {
         return stored as StoredMatch;
     }
 
+    // expected as a watch with a touchscreen has it: without one, the menus leave out Touch scoring.
     function assertItems(actual as Array<MatchMenuItem>, expected as Array<MatchMenuItem>, message as String) as Void {
+        if (!Settings.hasTouchScreen()) {
+            expected = expected.slice(0, null);
+            expected.remove(ITEM_TOUCH_SCORING);
+        }
         Test.assertEqualMessage(actual.toString(), expected.toString(), message);
     }
 

@@ -4,3 +4,41 @@ project.manifest = manifest.xml
 # default, ./**.mc, would also compile any other .mc file under the folder. resources/ is the default resource
 # path, and resources-fre/ is picked up for French.
 base.sourcePath = source
+
+# The launcher icon is 60 px (resources/drawables). The watches that take another size get the same
+# image scaled to theirs, from a later path that overrides LauncherIcon.
+fr165.resourcePath = $(fr165.resourcePath);launcher-icons/54
+fr165m.resourcePath = $(fr165m.resourcePath);launcher-icons/54
+fr170.resourcePath = $(fr170.resourcePath);launcher-icons/54
+fr170m.resourcePath = $(fr170m.resourcePath);launcher-icons/54
+fr57042mm.resourcePath = $(fr57042mm.resourcePath);launcher-icons/54
+fr70.resourcePath = $(fr70.resourcePath);launcher-icons/54
+d2mach2.resourcePath = $(d2mach2.resourcePath);launcher-icons/65
+d2mach2pro.resourcePath = $(d2mach2pro.resourcePath);launcher-icons/65
+fenix847mm.resourcePath = $(fenix847mm.resourcePath);launcher-icons/65
+fenix8pro47mm.resourcePath = $(fenix8pro47mm.resourcePath);launcher-icons/65
+fenix947mm.resourcePath = $(fenix947mm.resourcePath);launcher-icons/65
+fenix9pro47mm.resourcePath = $(fenix9pro47mm.resourcePath);launcher-icons/65
+fenix9pro51mm.resourcePath = $(fenix9pro51mm.resourcePath);launcher-icons/65
+fr57047mm.resourcePath = $(fr57047mm.resourcePath);launcher-icons/65
+fr965.resourcePath = $(fr965.resourcePath);launcher-icons/65
+fr970.resourcePath = $(fr970.resourcePath);launcher-icons/65
+marq3.resourcePath = $(marq3.resourcePath);launcher-icons/65
+
+# Code built per watch (excludeAnnotations), each feature as a pair of annotations:
+# - Touch scoring needs a touchscreen, which the Instinct 3 AMOLED doesn't have: it builds
+#   Settings.hasTouchScreen()'s (:noTouchScreen) version, every other watch the (:touchScreen) one.
+# - The Descent G2 and the Instinct 3 AMOLED have no vector fonts: they build bundled-fonts/ (Roboto
+#   Condensed as bitmap fonts, scripts/make-fonts.sh) and the (:bundledFonts) code that loads it.
+# - The Instinct 3 AMOLED's glances keep a round window at the right of their strip, which the glance's
+#   line keeps clear of (:glanceWindow).
+base.excludeAnnotations = noTouchScreen;bundledFonts;glanceWindow
+descentg2.excludeAnnotations = noTouchScreen;noBundledFonts;glanceWindow
+instinct3amoled45mm.excludeAnnotations = touchScreen;noBundledFonts;noGlanceWindow
+instinct3amoled50mm.excludeAnnotations = touchScreen;noBundledFonts;noGlanceWindow
+descentg2.sourcePath = $(descentg2.sourcePath);bundled-fonts/source
+instinct3amoled45mm.sourcePath = $(instinct3amoled45mm.sourcePath);bundled-fonts/source
+instinct3amoled50mm.sourcePath = $(instinct3amoled50mm.sourcePath);bundled-fonts/source
+descentg2.resourcePath = $(descentg2.resourcePath);bundled-fonts/resources
+instinct3amoled45mm.resourcePath = $(instinct3amoled45mm.resourcePath);bundled-fonts/resources
+instinct3amoled50mm.resourcePath = $(instinct3amoled50mm.resourcePath);bundled-fonts/resources

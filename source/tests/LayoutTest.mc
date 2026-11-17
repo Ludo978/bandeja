@@ -40,13 +40,15 @@ function layoutTextWidthTest(logger as Logger) as Boolean {
     // In mockup pixels, with the font the screen gets, the width doesn't depend on the screen. The
     // mockups' widths from Roboto Condensed Bold's advances: "30" at 120 is 121.4, "BREAK POINT" at 16
     // is 89.4 plus 10 letter spacings of 2. No spacing after the last character, nor for one character.
+    // The smaller screen is the FR265S's 360 px, or this watch's own where its fonts are bundled
+    // (BundledFonts: sized for the screens that bundle them, 390 and 416 px).
     var dc = (Graphics.createBufferedBitmap({:width => 4, :height => 4}).get() as Graphics.BufferedBitmap).getDc();
     var l416 = new Layout(416);
-    var l360 = new Layout(360);
+    var small = new Layout(Fonts.isVector() ? 360 : System.getDeviceSettings().screenWidth);
     TestKit.assertNear(l416.textWidth(dc, STYLE_NUMBER, 120, "30", 0), 121.4, 2);
-    TestKit.assertNear(l360.textWidth(dc, STYLE_NUMBER, 120, "30", 0), 121.4, 3);
+    TestKit.assertNear(small.textWidth(dc, STYLE_NUMBER, 120, "30", 0), 121.4, 3);
     TestKit.assertNear(l416.textWidth(dc, STYLE_BOLD, 16, "BREAK POINT", 2), 109.4, 2);
-    TestKit.assertNear(l360.textWidth(dc, STYLE_BOLD, 16, "BREAK POINT", 2), 109.4, 3);
+    TestKit.assertNear(small.textWidth(dc, STYLE_BOLD, 16, "BREAK POINT", 2), 109.4, 3);
     Test.assertEqual(l416.textWidth(dc, STYLE_BOLD, 16, "B", 2), l416.textWidth(dc, STYLE_BOLD, 16, "B", 0));
     Test.assertEqual(l416.textWidth(dc, STYLE_BOLD, 16, "", 2), 0.0);
     return true;
@@ -71,8 +73,14 @@ function fontsTest(logger as Logger) as Boolean {
 (:test)
 function fontsVectorTest(logger as Logger) as Boolean {
     // The FR265 and FR265S simulators have the vector fonts: the mockup size is the em size, loaded once
-    // per style and size. Without them, on this device's screen: the points get FONT_NUMBER_HOT,
-    // the labels the smallest text font, and big text the biggest text font, never a number font.
+    // per style and size. Without them, on this device's screen: the points get the number font nearest
+    // their line height (FONT_NUMBER_HOT on the FR265 and FR265S, FONT_NUMBER_MEDIUM on the fenix 9 Pro
+    // 51 mm, whose number fonts are larger), the labels the smallest text font, and big text the biggest
+    // text font, never a number font.
+    if (!(Graphics has :getVectorFont)) {
+        // The Descent G2 and the Instinct 3 AMOLED: their bundled fonts (fontsBundledTest).
+        return true;
+    }
     var l = new Layout(System.getDeviceSettings().screenWidth);
     var points = l.font(STYLE_NUMBER, 120);
     Test.assert(Fonts.isVector() && points instanceof Graphics.VectorFont);
@@ -81,11 +89,52 @@ function fontsVectorTest(logger as Logger) as Boolean {
     Test.assert(l.font(STYLE_REGULAR, 120) != l.font(STYLE_BOLD, 120));
     Fonts.setVectorEnabled(false);
     try {
-        Test.assert(!Fonts.isVector() && l.font(STYLE_NUMBER, 120) == Graphics.FONT_NUMBER_HOT);
+        var numbers = Fonts.fallbacks(STYLE_NUMBER);
+        var heights = [] as Array<Number>;
+        for (var i = 0; i < numbers.size(); i++) {
+            heights.add(Graphics.getFontHeight(numbers[i]));
+        }
+        var index = Fonts.nearest(Fonts.lineHeight(l.fontSize(120)), heights);
+        Test.assert(!Fonts.isVector() && l.font(STYLE_NUMBER, 120) == numbers[index]);
+        Test.assert(index >= Fonts.fallbacks(STYLE_BOLD).size());
+        if (l.width == 416 || l.width == 360) {
+            Test.assertEqual(numbers[index], Graphics.FONT_NUMBER_HOT);
+        }
         Test.assert(l.font(STYLE_BOLD, 15) == Graphics.FONT_XTINY && l.font(STYLE_REGULAR, 13) == Graphics.FONT_XTINY);
         Test.assertEqual(l.font(STYLE_BOLD, 120), Graphics.FONT_LARGE);
     } finally {
         Fonts.setVectorEnabled(true);
+    }
+    return true;
+}
+
+(:test :bundledFonts)
+function fontsBundledTest(logger as Logger) as Boolean {
+    // The watches without vector fonts (Descent G2, Instinct 3 AMOLED) draw with the bundled Roboto
+    // Condensed: every mockup size the screens use (and the labels' down to three quarters) gets a
+    // bundled size within a pixel of its em size on this screen, with the vector fonts' line height, and
+    // never a system font. The full character set's French and team name letters have glyphs.
+    Test.assert(!Fonts.isVector());
+    var l = new Layout(System.getDeviceSettings().screenWidth);
+    var dc = (Graphics.createBufferedBitmap({:width => 4, :height => 4}).get() as Graphics.BufferedBitmap).getDc();
+    var uses = [[STYLE_BOLD, [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 26, 44, 104, 120]],
+        [STYLE_NUMBER, [18, 24, 26, 30, 32, 46, 48, 56, 64, 96, 120]], [STYLE_REGULAR, [12, 16, 26]]] as Array<Array>;
+    for (var u = 0; u < uses.size(); u++) {
+        var style = uses[u][0] as FontStyle;
+        var sizes = uses[u][1] as Array<Number>;
+        for (var i = 0; i < sizes.size(); i++) {
+            var size = l.fontSize(sizes[i]);
+            var font = Fonts.get(style, size);
+            // The system fonts are FontDefinition values, Numbers.
+            Test.assertMessage(!(font instanceof Lang.Number), "system font at " + size);
+            var height = Graphics.getFontHeight(font);
+            Test.assertMessage((height - Fonts.lineHeight(size)).abs() <= 2, "height " + height + " at " + size);
+        }
+    }
+    var label = Fonts.get(STYLE_BOLD, l.fontSize(12));
+    var letters = "ÀÉÈÊÔÇŁŒÜßéèàçôł·";
+    for (var i = 0; i < letters.length(); i++) {
+        Test.assertMessage(dc.getTextWidthInPixels(letters.substring(i, i + 1) as String, label) > 0, letters.substring(i, i + 1) as String);
     }
     return true;
 }

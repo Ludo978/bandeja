@@ -1,6 +1,6 @@
 # Bandeja
 
-A padel score keeper for the Garmin Forerunner 265 and 265S. One button press per point: the watch handles the rules (deuce modes, tie-breaks, serve rotation, change of ends) and saves the match to Garmin Connect as a **Padel** activity, with heart rate, calories, training effect, the final score, one lap per game and the match stats.
+A padel score keeper for Garmin watches with a round AMOLED screen and five buttons: Forerunner 70, 165, 170, 265, 570, 965 and 970, fēnix 8, 9 and E, epix (Gen 2) and epix Pro (Gen 2), Instinct 3 AMOLED, Descent Mk3 and G2, D2 Mach, MARQ (Gen 3) and MARQ Aviator (Gen 2), with their quatix and tactix editions ([the full list](#build-from-source)). One button press per point: the watch handles the rules (deuce modes, tie-breaks, serve rotation, change of ends) and saves the match to Garmin Connect as a **Padel** activity, with heart rate, calories, training effect, the final score, one lap per game and the match stats.
 
 **[Get it free on the Connect IQ store](https://apps.garmin.com/apps/eb45fd94-cf4e-4d44-aa3c-3322c38a6e2e)**
 
@@ -35,7 +35,7 @@ A padel score keeper for the Garmin Forerunner 265 and 265S. One button press pe
 | BACK / LAP | Undo the last event | |
 | START / STOP | Pause, and the pause menu | |
 
-Points count when the button is released, so holding UP for the menu never scores. Two presses within the press delay (0.8 s by default) count as one point. Swipe left for the data page (time, heart rate, calories) and the stats page. With touch scoring on, a tap on the top or bottom half of the score page scores for that team.
+Points count when the button is released, so holding UP for the menu never scores. Two presses within the press delay (0.8 s by default) count as one point. Swipe left for the data page (time, heart rate, calories) and the stats page, or open them from the match menu (hold UP), as on the Instinct 3 AMOLED, which has no touchscreen. With touch scoring on, a tap on the top or bottom half of the score page scores for that team.
 
 ## In Garmin Connect
 
@@ -53,12 +53,24 @@ Bandeja makes no network requests. The only data that leaves the watch is the ac
 
 ## Settings
 
-On the watch (Settings, in the home screen's list) and in the app's settings in the Garmin Connect app: serve tracking, warm-up phase, vibration, sounds, change of ends alert, touch scoring, press delay and theme. Team names are typed in the Garmin Connect app only. Indoor or Outdoor and the timed match are picked in the Format menu.
+On the watch (Settings, in the home screen's list) and in the app's settings in the Garmin Connect app: serve tracking, warm-up phase, vibration, sounds, change of ends alert, touch scoring (not on the watch's menus without a touchscreen), press delay and theme. Team names are typed in the Garmin Connect app only. Indoor or Outdoor and the timed match are picked in the Format menu.
 
 ## Build from source
 
+Watches (`manifest.xml`, Connect IQ product IDs):
+
+| Screen | Watches |
+|---|---|
+| 360 px | Forerunner 265S (`fr265s`) |
+| 390 px | Forerunner 70, 165, 165 Music, 170, 170 Music, 570 42mm (`fr70`, `fr165`, `fr165m`, `fr170`, `fr170m`, `fr57042mm`), epix Pro (Gen 2) 42mm (`epix2pro42mm`), Descent Mk3 43mm and G2 (`descentmk343mm`, `descentg2`), Instinct 3 AMOLED 45mm (`instinct3amoled45mm`), MARQ Aviator (Gen 2) (`marq2aviator`) |
+| 416 px | Forerunner 265 (`fr265`), fēnix 8 43mm, 9 43mm, 9 Pro 43mm and E (`fenix843mm`, `fenix943mm`, `fenix9pro43mm`, `fenixe`), epix (Gen 2) and epix Pro (Gen 2) 47mm (`epix2`, `epix2pro47mm`), D2 Mach 1 (`d2mach1`), Instinct 3 AMOLED 50mm (`instinct3amoled50mm`) |
+| 454 px | Forerunner 570 47mm, 965 and 970 (`fr57047mm`, `fr965`, `fr970`), fēnix 8 47mm, 8 Pro 47mm, 9 47mm and 9 Pro 47mm (`fenix847mm`, `fenix8pro47mm`, `fenix947mm`, `fenix9pro47mm`), epix Pro (Gen 2) 51mm (`epix2pro51mm`), Descent Mk3i 51mm (`descentmk351mm`), D2 Mach 2 and Mach 2 Pro (`d2mach2`, `d2mach2pro`), MARQ (Gen 3) (`marq3`) |
+| 466 px | fēnix 9 Pro 51mm (`fenix9pro51mm`) |
+
+The screens are drawn from the FR265's 416 px design, scaled to each screen. The Descent G2 and the Instinct 3 AMOLED have no vector fonts: their builds bundle Roboto Condensed as bitmap fonts (`bundled-fonts/`, made by `scripts/make-fonts.sh`).
+
 Requirements:
-- The [Connect IQ SDK](https://developer.garmin.com/connect-iq/sdk/), installed with the SDK Manager, with the Forerunner 265 and 265S devices.
+- The [Connect IQ SDK](https://developer.garmin.com/connect-iq/sdk/), installed with the SDK Manager, with the devices you build for.
 - A developer key (`~/.garmin/developer_key.der`, or set `CIQ_KEY`).
 - macOS: `scripts/dev.sh` relies on the SDK Manager's macOS paths. Copying to a watch needs libmtp (`brew install libmtp`).
 
@@ -79,9 +91,10 @@ Layout:
 - `source/ui/`, `source/glance/`: screens, menus and input.
 - `source/tests/`: the unit tests (`(:test)` functions, left out of release builds).
 - `resources/`, `resources-fre/`: strings (English, French), settings and FIT field definitions.
+- `launcher-icons/`, `bundled-fonts/`: resources for some watches only (`monkey.jungle`): the launcher icon at their size, the bundled fonts.
 
 ## License
 
-[MIT](LICENSE).
+[MIT](LICENSE). The bundled fonts (`bundled-fonts/`) are Roboto Condensed, under the [Apache License 2.0](bundled-fonts/LICENSE).
 
 Bandeja is not affiliated with or endorsed by Garmin. Garmin, Forerunner, Connect IQ and Garmin Connect are trademarks of Garmin Ltd. or its subsidiaries.

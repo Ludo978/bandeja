@@ -1,8 +1,8 @@
 import Toybox.Lang;
 import Toybox.WatchUi;
 
-// The Settings menu: the v1 settings, the change of ends alert, touch scoring,
-// the press delay and the theme, each stored at once (Settings). The warm-up
+// The Settings menu: the v1 settings, the change of ends alert, touch scoring (on a watch with a
+// touchscreen), the press delay and the theme, each stored at once (Settings). The warm-up
 // and pause menus open it too, and the match menu has its Vibration, Sounds and
 // Touch scoring items. The team names are typed in the Garmin Connect app only, where every
 // item here can be changed too: a menu showing settings (this one, the pause and match menus) is
@@ -27,7 +27,9 @@ module SettingsMenu {
         menu.addItem(soundsItem(:sounds));
         menu.addItem(new WatchUi.ToggleMenuItem(Rez.Strings.MenuChangeOfEnds, null, :changeOfEnds,
             Settings.isChangeOfEndsAlert(), null));
-        menu.addItem(touchScoringItem(:touchScoring));
+        if (Settings.hasTouchScreen()) {
+            menu.addItem(touchScoringItem(:touchScoring));
+        }
         menu.addItem(new WatchUi.MenuItem(Rez.Strings.MenuDebounce, debounceName(Settings.getDebounce()), :debounce, null));
         menu.addItem(new WatchUi.MenuItem(Rez.Strings.MenuTheme, themeName(Settings.getTheme()), :theme, null));
         var items = {} as Dictionary<Object, Symbol>;

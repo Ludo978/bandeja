@@ -135,6 +135,21 @@ module Settings {
         write(TOUCH_SCORING, on);
     }
 
+    // Whether the watch has a touchscreen, which Touch scoring needs: the menus leave it out on
+    // the watches without one (the Instinct 3 AMOLED and Instinct Crossover AMOLED). Known per watch
+    // when it's built, monkey.jungle excluding one of the two below, rather than from
+    // DeviceSettings.isTouchScreen, which is also false on a touch watch whose touch is turned off in
+    // its settings: there the item stays, as harmless as a tap that never comes.
+    (:touchScreen)
+    function hasTouchScreen() as Boolean {
+        return true;
+    }
+
+    (:noTouchScreen)
+    function hasTouchScreen() as Boolean {
+        return false;
+    }
+
     // The team colors (Palette). Each screen reads it when it shows, so a change in the Settings menu
     // applies when the screen comes back.
     function getTheme() as ThemeSetting {
