@@ -5,8 +5,8 @@ import Toybox.WatchUi;
 // The serve questions (ServeQuestions) as native menus: UP and DOWN
 // move, START picks. They open over the match screen when the match starts. The second question
 // takes the first one's place and BACK there brings the first back, so only one is ever open; the
-// last answer, or BACK on the first question, closes it on the match screen. While they show the
-// recording goes on, and no point can be scored.
+// last answer closes it on the match screen, and BACK on the first question does nothing. While they
+// show the recording goes on, and no point can be scored.
 module ServeMenu {
 
     // Opens the current question, if there is one to ask.
@@ -40,9 +40,12 @@ class ServeMenuDelegate extends WatchUi.Menu2InputDelegate {
         show(_questions.pick(item.getId() as Number as ServeAnswer, Time.now().value()), WatchUi.SLIDE_LEFT);
     }
 
-    // Never leaves the match (a swipe right too).
+    // Back to the first question from the second; nothing on the first, which must be answered. Never
+    // leaves the match (a swipe right too).
     function onBack() as Void {
-        show(_questions.back(), WatchUi.SLIDE_RIGHT);
+        if (_questions.back()) {
+            show(QUESTION_FIRST, WatchUi.SLIDE_RIGHT);
+        }
     }
 
     // The next question in this one's place, or the match screen.

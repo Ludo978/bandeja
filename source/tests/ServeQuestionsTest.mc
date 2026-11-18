@@ -6,7 +6,7 @@ import Toybox.Test;
 // before the first point, only with serve tracking on. The answers are logged through the match holder
 // as FIX_SERVING_TEAM, then SWAP_OUR_SERVER for Partner, so the engine's server and its
 // rotation over the first games follow them. BACK on the second question goes back to the first; BACK
-// on the first starts with the server unknown.
+// on the first does nothing: the question can't be skipped.
 //
 // The log is written as its event codes: 103 FIX_SERVING_TEAM Us, 203 FIX_SERVING_TEAM Them, 2
 // SWAP_OUR_SERVER. The rotation is who serves each of the first games, as TestKit.server() writes it.
@@ -45,30 +45,28 @@ function serveQuestionsMenusTest(logger as Logger) as Boolean {
 
 (:test)
 function serveQuestionsBackTest(logger as Logger) as Boolean {
-    // BACK on the first question: the match starts with the server unknown and nothing logged, nothing
-    // more to ask; Fix serving team (the menus) starts the rotation later. BACK on the second
-    // question: back to the first, on Opponents, with nothing logged; an answer there then counts as
-    // usual; BACK on both: the server unknown. With serve tracking off nothing is asked or logged.
+    // BACK on the first question does nothing: it stays, on the same answer, nothing logged, as often as
+    // it's pressed, so the server is always answered; an answer then counts as usual. BACK on the second
+    // question: back to the first, on Opponents, with nothing logged; BACK there does nothing either, and
+    // an answer counts as usual. Once answered there's nothing to go back to. With serve tracking off
+    // nothing is asked or logged.
     var match = ServeQuestionsTests.newMatch(true);
     var questions = new ServeQuestions(match, true);
-    Test.assertEqual(questions.back(), QUESTION_NONE);
-    Test.assert(questions.pick(ANSWER_ME, ServeQuestionsTests.TIME) == QUESTION_NONE && questions.back() == QUESTION_NONE);
+    for (var i = 0; i < 3; i++) {
+        Test.assert(!questions.back() && questions.getQuestion() == QUESTION_FIRST && questions.getFocus() == ANSWER_ME);
+    }
     ServeQuestionsTests.assertServer(match, "", null, null);
-    Test.assert(match.add(new MatchEvent(EVENT_FIX_SERVING_TEAM, ServeQuestionsTests.TIME, TEAM_US)));
-    Test.assertEqual(ServeQuestionsTests.rotation(match, 3), "ME THEM PARTNER");
+    Test.assert(questions.pick(ANSWER_ME, ServeQuestionsTests.TIME) == QUESTION_NONE && !questions.back());
+    Test.assertEqual(questions.getQuestion(), QUESTION_NONE);
+    ServeQuestionsTests.assertServer(match, "103", TEAM_US, PLAYER_ME);
     match = ServeQuestionsTests.newMatch(true);
     questions = new ServeQuestions(match, true);
     questions.pick(ANSWER_OPPONENTS, ServeQuestionsTests.TIME);
-    Test.assert(questions.back() == QUESTION_FIRST && questions.getTitle() == Rez.Strings.ServeFirst);
+    Test.assert(questions.back() && questions.getQuestion() == QUESTION_FIRST && questions.getTitle() == Rez.Strings.ServeFirst);
     Test.assert(questions.getFocus() == ANSWER_OPPONENTS && match.getState().eventCount == 0);
+    Test.assert(!questions.back() && questions.getQuestion() == QUESTION_FIRST && questions.getFocus() == ANSWER_OPPONENTS);
     Test.assertEqual(questions.pick(ANSWER_PARTNER, ServeQuestionsTests.TIME), QUESTION_NONE);
     ServeQuestionsTests.assertServer(match, "103 2", TEAM_US, PLAYER_PARTNER);
-    match = ServeQuestionsTests.newMatch(true);
-    questions = new ServeQuestions(match, true);
-    questions.pick(ANSWER_OPPONENTS, ServeQuestionsTests.TIME);
-    questions.back();
-    Test.assertEqual(questions.back(), QUESTION_NONE);
-    Test.assertEqual(ServeQuestionsTests.rotation(match, 3), "? ? ?");
     match = ServeQuestionsTests.newMatch(true);
     questions = new ServeQuestions(match, false);
     Test.assert(questions.getQuestion() == QUESTION_NONE && questions.pick(ANSWER_ME, ServeQuestionsTests.TIME) == QUESTION_NONE);
@@ -78,8 +76,9 @@ function serveQuestionsBackTest(logger as Logger) as Boolean {
 
 (:test)
 function serveQuestionsUndoTest(logger as Logger) as Boolean {
-    // The answers are events like any other: undo removes them, the last first, back to an
-    // unknown server before the first point. Asked again, the same answers log the same events, or with
+    // In the log the answers are events like any other: the match holder's undo removes them, the last
+    // first, back to an unknown server before the first point (BACK on the score screen keeps them,
+    // scoreInputUndoKeepsServeSetUpTest). Asked again, the same answers log the same events, or with
     // part of them still logged only the rest; another answer logs what makes it true.
     var match = ServeQuestionsTests.newMatch(true);
     new ServeQuestions(match, true).pick(ANSWER_PARTNER, ServeQuestionsTests.TIME);

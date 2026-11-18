@@ -172,9 +172,11 @@ function scoreInputUndoClearsDebounceTest(logger as Logger) as Boolean {
 (:test)
 function scoreInputUndoToastsTest(logger as Logger) as Boolean {
     // BACK undoes the last event of any type, and the toast names it. With the log empty,
-    // BACK says so and nothing else happens.
+    // BACK says so and nothing else happens. A point comes first, so the serve events aren't the serve's
+    // set-up, which BACK keeps (scoreInputUndoKeepsServeSetUpTest).
     var rig = new TestKit.Rig(new MatchConfig(), "", false);
-    var events = TestKit.oneOfEachType();
+    var events = [new MatchEvent(EVENT_POINT_US, TestKit.T0 - 10, null)];
+    events.addAll(TestKit.oneOfEachType());
     for (var i = 0; i < events.size(); i++) {
         Test.assertMessage(rig.match.add(events[i]), "add " + events[i]);
     }
@@ -190,6 +192,32 @@ function scoreInputUndoToastsTest(logger as Logger) as Boolean {
     }
     Test.assert(rig.input.key(WatchUi.KEY_ESC, 2000) == INPUT_TOAST && rig.input.toast == Rez.Strings.UndoneNothing);
     Test.assert(rig.input.undone == null);
+    return true;
+}
+
+(:test)
+function scoreInputUndoKeepsServeSetUpTest(logger as Logger) as Boolean {
+    // BACK never undoes the serve's set-up, the serve events logged before anything else: with only the
+    // "Who serves first?" answer logged (Partner: the team, then the swap), BACK says "Nothing to undo"
+    // and the server stays; a serve correction from the menus before anything else stays with it. A
+    // deuce mode change or a point after them is undone, then nothing; a serve correction after a point
+    // is undone as usual.
+    var rig = new TestKit.Rig(new MatchConfig(), "Partner", false);
+    var input = rig.input;
+    Test.assert(input.key(WatchUi.KEY_ESC, 1000) == INPUT_TOAST && input.toast == Rez.Strings.UndoneNothing);
+    Test.assert(input.undone == null && rig.getState().eventCount == 2);
+    Test.assert(rig.getState().getServingTeam() == TEAM_US && rig.getState().getServingPlayer() == PLAYER_PARTNER);
+    rig.add(EVENT_FIX_SERVING_TEAM, TEAM_THEM);
+    Test.assert(input.key(WatchUi.KEY_ESC, 1100) == INPUT_TOAST && input.toast == Rez.Strings.UndoneNothing);
+    Test.assert(rig.getState().eventCount == 3 && rig.getState().getServingTeam() == TEAM_THEM);
+    rig.add(EVENT_SET_DEUCE_MODE, DEUCE_GOLDEN);
+    Test.assert(input.key(WatchUi.KEY_ESC, 1200) == INPUT_UNDO && input.toast == Rez.Strings.UndoneDeuceMode);
+    Test.assertEqual(input.key(WatchUi.KEY_DOWN, 1300), INPUT_POINT);
+    rig.add(EVENT_FIX_SERVING_TEAM, TEAM_US);
+    Test.assert(input.key(WatchUi.KEY_ESC, 1400) == INPUT_UNDO && input.toast == Rez.Strings.UndoneServingTeam);
+    Test.assert(input.key(WatchUi.KEY_ESC, 1500) == INPUT_UNDO && input.toast == Rez.Strings.UndonePointUs);
+    Test.assert(input.key(WatchUi.KEY_ESC, 1600) == INPUT_TOAST && input.toast == Rez.Strings.UndoneNothing);
+    Test.assert(rig.getState().eventCount == 3 && rig.getState().getServingTeam() == TEAM_THEM);
     return true;
 }
 

@@ -80,17 +80,19 @@ function matchMenuLabelsTest(logger as Logger) as Boolean {
 function matchMenuServeItemsTest(logger as Logger) as Boolean {
     // Swap: we serve, I do: my partner serves now, and BACK gives me the serve back; they serve: our
     // order for our next game, mid-game too; refused in singles, nothing logged. Fix serving team:
-    // from unknown Us starts serve tracking and BACK makes it unknown again; the team already serving
-    // logs nothing, the other one is logged; in a tie-break it names the team serving the point, which
-    // changes within it.
+    // from unknown Us starts serve tracking; before anything else it and a swap after it are the
+    // serve's set-up, which BACK keeps. The team already serving logs nothing, the other one is
+    // logged; in a tie-break it names the team serving the point, which changes within it.
     var rig = new TestKit.Rig(new MatchConfig(), "", false);
     var rules = rig.rules;
     Test.assert(rules.getServingTeam() == null);
-    var before = rig.getState().copy();
     Test.assert(rules.fixServingTeam(TEAM_US, TestKit.MENU_TIME) && rules.getServingTeam() == TEAM_US);
-    rig.assertUndone(before, 103, Rez.Strings.UndoneServingTeam, "fix from unknown");
-    Test.assert(rules.fixServingTeam(TEAM_US, TestKit.MENU_TIME));
-    before = rig.getState().copy();
+    Test.assert(rules.swapServer(TestKit.MENU_TIME) && rig.getState().getServingPlayer() == PLAYER_PARTNER);
+    Test.assert(rig.input.key(WatchUi.KEY_ESC, 0) == INPUT_TOAST && rig.input.toast == Rez.Strings.UndoneNothing);
+    Test.assert(rig.getState().eventCount == 2 && rig.getState().getServingPlayer() == PLAYER_PARTNER);
+    Test.assert(rules.swapServer(TestKit.MENU_TIME) && rig.getState().getServingPlayer() == PLAYER_ME);
+    rig.play("u");
+    var before = rig.getState().copy();
     Test.assert(rules.swapServer(TestKit.MENU_TIME) && rig.getState().getServingPlayer() == PLAYER_PARTNER);
     rig.assertUndone(before, 2, Rez.Strings.UndoneServerSwap, "swap, we serve");
     rig.play("U ut");

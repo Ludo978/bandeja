@@ -136,7 +136,7 @@ function scoreTieBreakOnlyTest(logger as Logger) as Boolean {
 
 (:test)
 function scoreServeIndicatorTest(logger as Logger) as Boolean {
-    // The server unknown (serve tracking off, or BACK on the first serve question): no ball and no YOU
+    // The server unknown (serve tracking off): no ball and no YOU
     // / PARTNER, until Fix serving team. Our players alternate over our service games; theirs show no
     // name. Singles: our only player is YOU. Once the match is over there is no next point: no ball,
     // banner or caption.

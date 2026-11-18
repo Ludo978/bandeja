@@ -30,7 +30,8 @@ enum PointWon {
 // point press less than debounce ms (the Press delay setting) after the last point that counted is
 // ignored, for either team.
 // BACK undoes the last event of any type, never debounced, and the point it takes back no longer
-// holds the next press. START pauses, or resumes when paused. While paused, UP, DOWN and BACK change
+// holds the next press. It never undoes the serve's set-up, the serve events logged before any other
+// (the "Who serves first?" answers): with only those left it says "Nothing to undo". START pauses, or resumes when paused. While paused, UP, DOWN and BACK change
 // nothing and bring the toast "Paused". A swipe left turns to the next page (the data page, then the
 // stats page) and a swipe right to the one before, other swipes do nothing. The data page and the
 // stats page take the same input.
@@ -182,7 +183,10 @@ class ScoreInput {
         if (_session.isPaused()) {
             return showToast(Rez.Strings.ToastPaused);
         }
-        var event = _match.undo();
+        // The serve's set-up stays: undone, it would leave the server unknown before the first point,
+        // so a stray BACK at 0-0 would lose the serve tracker. Fix serving team and Swap our server
+        // order (the match menu) change it.
+        var event = _match.engine.isServeSetUpOnly() ? null : _match.undo();
         if (event == null) {
             return showToast(Rez.Strings.UndoneNothing);
         }

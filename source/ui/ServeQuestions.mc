@@ -20,10 +20,10 @@ enum ServeAnswer {
 // (ServeMenu), so they're unit-tested.
 //
 // The last answer logs the events through the match holder: FIX_SERVING_TEAM for the team,
-// then SWAP_OUR_SERVER when our first server is Partner, so they're saved and undone like any
-// event. Nothing is logged before it: BACK on the second question goes back to the first, and BACK
-// on the first leaves the server unknown, for Fix serving team to set later. BACK never leaves the
-// match.
+// then SWAP_OUR_SERVER when our first server is Partner, so they're saved like any event. BACK on
+// the score screen leaves them (ScoreInput): Fix serving team and Swap our server order change
+// them. Nothing is logged before the last answer: BACK on the second question goes back to the first, and BACK
+// on the first does nothing, so the question can't be skipped. BACK never leaves the match.
 class ServeQuestions {
 
     private var _match as CurrentMatch;
@@ -78,15 +78,16 @@ class ServeQuestions {
         return _question;
     }
 
-    // BACK, or a swipe right. Returns the question that follows.
-    function back() as ServeQuestion {
-        if (_question == QUESTION_SECOND) {
-            _question = QUESTION_FIRST;
-            _focus = ANSWER_OPPONENTS;
-        } else {
-            _question = QUESTION_NONE;
+    // BACK, or a swipe right: true when it goes back to the first question. On the first it does
+    // nothing (false): with serve tracking on the question is always answered, since a server left
+    // unknown would stay so all match, with no tracker and nothing saying how to set it.
+    function back() as Boolean {
+        if (_question != QUESTION_SECOND) {
+            return false;
         }
-        return _question;
+        _question = QUESTION_FIRST;
+        _focus = ANSWER_OPPONENTS;
+        return true;
     }
 
     // Logs what the state needs to say team serves now and player serves our first game: at the

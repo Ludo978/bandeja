@@ -188,6 +188,35 @@ function scoringEngineUndoToStartTest(logger as Logger) as Boolean {
 }
 
 (:test)
+function scoringEngineServeSetUpTest(logger as Logger) as Boolean {
+    // The log holds only the serve's set-up while it's empty or every event in it is FIX_SERVING_TEAM or
+    // SWAP_OUR_SERVER (the "Who serves first?" answers, a correction before anything else). An event of
+    // any other type ends it, a score edit too, the serve events after it included, until it's undone.
+    var t = TestKit.T0;
+    var engine = new ScoringEngine(new MatchConfig());
+    Test.assert(engine.isServeSetUpOnly());
+    Test.assert(engine.add(new MatchEvent(EVENT_FIX_SERVING_TEAM, t, TEAM_THEM)));
+    Test.assert(engine.add(new MatchEvent(EVENT_SWAP_OUR_SERVER, t + 1, null)));
+    Test.assert(engine.add(new MatchEvent(EVENT_FIX_SERVING_TEAM, t + 2, TEAM_US)));
+    Test.assert(engine.isServeSetUpOnly());
+    var others = [new MatchEvent(EVENT_POINT_US, t + 10, null), new MatchEvent(EVENT_POINT_THEM, t + 10, null),
+        new MatchEvent(EVENT_SET_DEUCE_MODE, t + 10, DEUCE_GOLDEN), new MatchEvent(EVENT_END_SET, t + 10, TEAM_US),
+        new MatchEvent(EVENT_END_MATCH, t + 10, null), MatchEvent.editScore(t + 10, TestKit.edit("| 2-1 2-1"))];
+    for (var i = 0; i < others.size(); i++) {
+        Test.assertMessage(engine.add(others[i]), "add " + others[i]);
+        Test.assertMessage(!engine.isServeSetUpOnly(), "after " + others[i]);
+        if (!engine.getState().matchOver) {
+            Test.assert(engine.add(new MatchEvent(EVENT_SWAP_OUR_SERVER, t + 20, null)));
+            Test.assertMessage(!engine.isServeSetUpOnly(), "serve event after " + others[i]);
+            engine.undo();
+        }
+        engine.undo();
+        Test.assertMessage(engine.isServeSetUpOnly(), "undone " + others[i]);
+    }
+    return true;
+}
+
+(:test)
 function scoringEngineTieBreakOnlyUndoResumeTest(logger as Logger) as Boolean {
     // Tie-break only undoes and resumes like any match. A tie-break to 10 won
     // 22-20, 44 events, past an undo snapshot: resumed from its log with the format read back from its

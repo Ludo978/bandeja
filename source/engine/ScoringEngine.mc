@@ -339,6 +339,20 @@ class ScoringEngine {
         return _size;
     }
 
+    // The log holds only the serve's set-up: no event, or only FIX_SERVING_TEAM and SWAP_OUR_SERVER,
+    // the "Who serves first?" answers and any serve correction made before anything else. Read from the
+    // log's start, so it stops at the match's first other event.
+    function isServeSetUpOnly() as Boolean {
+        for (var offset = 0; offset < _size; offset += LOG_NUMBERS_PER_EVENT) {
+            // An edit, which spans more Numbers, reads as null here: not a serve event.
+            var event = MatchEvent.fromCode(_log[offset] as Object?, _log[offset + 1] as Object?);
+            if (event == null || (event.type != EVENT_FIX_SERVING_TEAM && event.type != EVENT_SWAP_OUR_SERVER)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     // A copy of the log's Numbers from from to to (to past the log's end: to its end).
     function getLogPart(from as Number, to as Number) as Array<Application.Storage.ValueType> {
         return _log.slice(from, to < _size ? to : _size);
