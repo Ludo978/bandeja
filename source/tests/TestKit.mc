@@ -1525,9 +1525,10 @@ module TestKit {
             return engine.getState();
         }
 
-        // A key at now: the score screen's input acts, then the motion follows, as ScoreDelegate passes them.
+        // A key at now on the page showing: the score screen's input acts, then the motion follows, as
+        // ScoreDelegate passes them.
         function press(key as WatchUi.Key, now as Number) as ScoreAction {
-            return follow(input.key(key, now), now);
+            return follow(input.pageKey(key, motion.page, now), now);
         }
 
         function swipe(direction as WatchUi.SwipeDirection, now as Number) as ScoreAction {
@@ -1540,7 +1541,17 @@ module TestKit {
             return follow(input.tap(y, TAP_HEIGHT, motion.page, now), now);
         }
 
-        // A touch other than a tap or a swipe: a hold, its release, a drag, a flick.
+        // A touch hold y pixels from the top of the FR265's 416 px screen, on the page showing (touch
+        // scoring by hold), and the release that ends a touch.
+        function hold(y as Number, now as Number) as ScoreAction {
+            return follow(input.hold(y, TAP_HEIGHT, motion.page, now), now);
+        }
+
+        function release(now as Number) as ScoreAction {
+            return follow(input.release(now), now);
+        }
+
+        // A touch that only counts as one: a drag, a flick (a hold or a release where they score nothing).
         function touch(now as Number) as ScoreAction {
             return follow(input.touch(now), now);
         }

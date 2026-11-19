@@ -6,7 +6,9 @@ import Toybox.WatchUi;
 // and pause menus open it too, and the match menu has its Vibration, Sounds and
 // Touch scoring items. The team names are typed in the Garmin Connect app only, where every
 // item here can be changed too: a menu showing settings (this one, the pause and match menus) is
-// watched (watch()), and shows such a change at once (refresh()).
+// watched (watch()), and shows such a change at once (refresh()). On the watches without UP and DOWN
+// (InputFlags) touch scoring is always on: its item shows the gesture that scores, Tap or Hold, and
+// opens their list. Sounds is left out where the watch plays no tones.
 module SettingsMenu {
 
     // The menus showing settings, weakly held (a menu closed goes), each with its setting items: the
@@ -15,8 +17,8 @@ module SettingsMenu {
     var _items as Array<Dictionary<Object, Symbol>> = [] as Array<Dictionary<Object, Symbol>>;
 
     // The Settings menu's items, each id the setting it shows.
-    const ITEMS = [:serveTracking, :warmUp, :vibration, :sounds, :changeOfEnds, :touchScoring, :debounce, :theme]
-        as Array<Symbol>;
+    const ITEMS = [:serveTracking, :warmUp, :vibration, :sounds, :changeOfEnds, :touchScoring, :touchGesture, :debounce,
+        :theme] as Array<Symbol>;
 
     function open() as Void {
         var menu = new WatchUi.Menu2({:title => Rez.Strings.MenuSettings});
@@ -24,10 +26,14 @@ module SettingsMenu {
             Settings.isServeTracking(), null));
         menu.addItem(new WatchUi.ToggleMenuItem(Rez.Strings.MenuWarmUp, null, :warmUp, Settings.isWarmUp(), null));
         menu.addItem(vibrationItem(:vibration));
-        menu.addItem(soundsItem(:sounds));
+        if (InputFlags.hasTones()) {
+            menu.addItem(soundsItem(:sounds));
+        }
         menu.addItem(new WatchUi.ToggleMenuItem(Rez.Strings.MenuChangeOfEnds, null, :changeOfEnds,
             Settings.isChangeOfEndsAlert(), null));
-        if (Settings.hasTouchScreen()) {
+        if (InputFlags.touchOnly()) {
+            menu.addItem(touchGestureItem(:touchGesture));
+        } else if (Settings.hasTouchScreen()) {
             menu.addItem(touchScoringItem(:touchScoring));
         }
         menu.addItem(new WatchUi.MenuItem(Rez.Strings.MenuDebounce, debounceName(Settings.getDebounce()), :debounce, null));
@@ -76,6 +82,8 @@ module SettingsMenu {
             item.setSubLabel(debounceName(Settings.getDebounce()));
         } else if (setting == :theme) {
             item.setSubLabel(themeName(Settings.getTheme()));
+        } else if (setting == :touchGesture) {
+            item.setSubLabel(MatchMenuRules.gestureName(Settings.getTouchGesture()));
         } else if (item instanceof WatchUi.ToggleMenuItem) {
             item.setEnabled(isOn(setting));
         }
@@ -125,6 +133,27 @@ module SettingsMenu {
     // and the score screen reads it at each tap.
     function touchScoringItem(id as Object) as WatchUi.ToggleMenuItem {
         return new WatchUi.ToggleMenuItem(Rez.Strings.MenuTouchScoring, null, id, Settings.isTouchScoring(), null);
+    }
+
+    // Touch scoring on the watches without UP and DOWN, always on: the gesture that scores under it,
+    // Tap or Hold. pushTouchGesture() opens the two.
+    function touchGestureItem(id as Object) as WatchUi.MenuItem {
+        return new WatchUi.MenuItem(Rez.Strings.MenuTouchScoring, MatchMenuRules.gestureName(Settings.getTouchGesture()), id,
+            null);
+    }
+
+    // The gestures over menu, on the current one. A choice is stored at once and shown under the item id;
+    // the score screen reads it at each touch.
+    function pushTouchGesture(menu as WatchUi.Menu2, id as Object) as Void {
+        var gestures = [GESTURE_TAP, GESTURE_HOLD] as Array<TouchGesture>;
+        var labels = [] as Array<String or ResourceId>;
+        var values = [] as Array<Number>;
+        for (var i = 0; i < gestures.size(); i++) {
+            labels.add(MatchMenuRules.gestureName(gestures[i]));
+            values.add(gestures[i] as Number);
+        }
+        ChoiceMenu.push(Rez.Strings.MenuTouchScoring, labels, values, Settings.getTouchGesture() as Number,
+            new GestureChoice(menu, id).method(:onChoice));
     }
 
     // The Vibration choices over menu, on the current one. A choice is stored at once, so it applies
@@ -218,6 +247,23 @@ class VibrationChoice {
     }
 }
 
+// A gesture choice (SettingsMenu.pushTouchGesture()): stored, and shown under the menu's item.
+class GestureChoice {
+
+    private var _menu as WatchUi.Menu2;
+    private var _id as Object;
+
+    function initialize(menu as WatchUi.Menu2, id as Object) {
+        _menu = menu;
+        _id = id;
+    }
+
+    function onChoice(value as Number) as Void {
+        Settings.setTouchGesture(value as TouchGesture);
+        ChoiceMenu.setSubLabel(_menu, _id, MatchMenuRules.gestureName(Settings.getTouchGesture()));
+    }
+}
+
 // A Press delay choice (SettingsMenu.pushDebounce()): stored, and shown under the menu's item.
 class DebounceChoice {
 
@@ -272,6 +318,9 @@ class SettingsMenuDelegate extends WatchUi.Menu2InputDelegate {
             return;
         } else if (id == :debounce) {
             SettingsMenu.pushDebounce(_menu, :debounce);
+            return;
+        } else if (id == :touchGesture) {
+            SettingsMenu.pushTouchGesture(_menu, :touchGesture);
             return;
         }
         var on = (item as WatchUi.ToggleMenuItem).isEnabled();

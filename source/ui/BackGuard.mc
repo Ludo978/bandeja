@@ -4,7 +4,7 @@ import Toybox.WatchUi;
 // What a KEY_ESC should do (BackGuard.check()).
 enum BackCheck {
     BACK_NOW,     // the BACK button: act at once
-    BACK_WAIT,    // act after BackGuard.WAIT_MS unless a touch comes first (untouchedSince())
+    BACK_WAIT,    // act after the guard's wait (BackGuard.wait) unless a touch comes first (untouchedSince())
     BACK_IGNORE   // not a BACK press: do nothing
 }
 
@@ -21,22 +21,42 @@ enum BackCheck {
 // touches of that tap, so BACK right after a tapped point undoes it. And the TOUCH_MS after a quick
 // KEY_ESC are the edge swipe's (isEdgeSwipe()): a tap then never scores, whatever the watch makes of
 // the swipe's end.
+//
+// The watches without UP and DOWN (InputFlags) score by touch, some by hold: a hold that scores
+// (holdScored()) starts no wait either, nor do its own touches, up to its release (holdReleased()) or
+// for HOLD_MS when the watch sends none.
+// And they set two flags. The menu key cancels a BACK key-down before it (menuCancels): their hold BACK
+// sends BACK's key-down, then the menu key, and a BACK key a release may bring after it is not a BACK
+// press. A quick KEY_ESC waits LONG_WAIT_MS (wait): the BACK button there is the only way to undo, and
+// when their edge swipe's touches follow its fake BACK is unknown (no such watch measured), so the
+// guard gives them longer to come. A guess: a watch that sends no touch after it still undoes.
 class BackGuard {
 
     static const PRESS_MS = 25;
     static const WAIT_MS = 100;
+    static const LONG_WAIT_MS = 300;
     static const TOUCH_MS = 800;
     // A tap's own touches that may reach the app after its onTap (its release, if the watch sends one),
     // timed when their handlers run, after the point's work and its redraw.
     static const TAP_END_MS = 200;
+    // A hold's own touches after its onHold: its drags and its release, the finger lifted after the
+    // point's buzz. A watch may send no release, or the hold again while the finger stays (ScoreInput
+    // scores one point a hold within it).
+    static const HOLD_MS = 2000;
+
+    // How long a quick KEY_ESC waits for a touch (BACK_WAIT): WAIT_MS, or LONG_WAIT_MS (InputFlags).
+    var wait as Number = WAIT_MS;
+    // The menu key cancels a BACK key-down before it (InputFlags).
+    var menuCancels as Boolean = false;
 
     private var _pressedAt as Number? = null;
     // The last touch of any kind (untouchedSince()), and the last one that starts the TOUCH_MS wait:
     // every touch but a tap that scored and its own.
     private var _touchAt as Number? = null;
     private var _waitFrom as Number? = null;
-    // The last tap that scored.
+    // The last tap that scored, and the last hold.
     private var _tapAt as Number? = null;
+    private var _holdAt as Number? = null;
     // The last KEY_ESC that came within PRESS_MS of its key-down: the edge swipe's (or the simulator's).
     private var _quickAt as Number? = null;
 
@@ -44,14 +64,17 @@ class BackGuard {
     function keyPressed(key as WatchUi.Key, now as Number) as Void {
         if (key == WatchUi.KEY_ESC) {
             _pressedAt = now;
+        } else if (key == WatchUi.KEY_MENU && menuCancels) {
+            _pressedAt = null;
         }
     }
 
-    // From every touch (tap, hold, release, drag, swipe, flick) but a tap that scored.
+    // From every touch (tap, hold, release, drag, swipe, flick) but a tap or a hold that scored.
     function touched(now as Number) as Void {
         _touchAt = now;
         var tapAt = _tapAt;
-        if (tapAt == null || !within(now, tapAt, TAP_END_MS)) {
+        var holdAt = _holdAt;
+        if ((tapAt == null || !within(now, tapAt, TAP_END_MS)) && (holdAt == null || !within(now, holdAt, HOLD_MS))) {
             _waitFrom = now;
         }
     }
@@ -64,9 +87,27 @@ class BackGuard {
         _tapAt = now;
     }
 
-    // From onKey. Other keys are always BACK_NOW.
+    // A hold that scored (touch scoring by hold, ScoreInput.hold()): no TOUCH_MS wait from it or from its
+    // touches, those before it (its touch-down) and those HOLD_MS after it.
+    function holdScored(now as Number) as Void {
+        _touchAt = now;
+        _waitFrom = null;
+        _holdAt = now;
+    }
+
+    // The release that ends a hold that scored (ScoreInput.release()): the hold's last touch, which starts
+    // no wait within HOLD_MS of it. The touches after it are no longer the hold's: they start the wait.
+    function holdReleased(now as Number) as Void {
+        touched(now);
+        _holdAt = null;
+    }
+
+    // From onKey. Other keys are always BACK_NOW; the menu key cancels a BACK key-down (menuCancels).
     function check(key as WatchUi.Key, now as Number) as BackCheck {
         if (key != WatchUi.KEY_ESC) {
+            if (key == WatchUi.KEY_MENU && menuCancels) {
+                _pressedAt = null;
+            }
             return BACK_NOW;
         }
         var pressedAt = _pressedAt;
@@ -86,7 +127,7 @@ class BackGuard {
         return quick ? BACK_WAIT : BACK_NOW;
     }
 
-    // For a BACK_WAIT checked at `at`, WAIT_MS later: true when no touch came since.
+    // For a BACK_WAIT checked at `at`, the wait later: true when no touch came since.
     function untouchedSince(at as Number) as Boolean {
         return _touchAt == null || (_touchAt as Number) < at;
     }

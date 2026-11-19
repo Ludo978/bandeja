@@ -113,3 +113,96 @@ function backGuardTapTest(logger as Logger) as Boolean {
     Test.assert(guard.check(WatchUi.KEY_ESC, last + 401) == BACK_WAIT && guard.isEdgeSwipe(last + 900));
     return true;
 }
+
+// Touch scoring by hold (the watches without UP and DOWN): a hold that scored doesn't start the 800 ms
+// wait, nor do its own touches, those before it and those within HOLD_MS after it (its drags, its
+// release), so the BACK button after a held point undoes it whether the watch sends the release or not.
+// A touch past HOLD_MS starts the wait again.
+(:test)
+function backGuardHoldTest(logger as Logger) as Boolean {
+    // Its touch-down, the hold, drags, the release 600 ms later, BACK 300 ms after it: at once.
+    var guard = new BackGuard();
+    guard.touched(900);
+    guard.holdScored(1000);
+    guard.touched(1100);
+    guard.touched(1600);
+    guard.keyPressed(WatchUi.KEY_ESC, 1900);
+    Test.assert(guard.check(WatchUi.KEY_ESC, 1980) == BACK_NOW);
+    // No release: a drag at HOLD_MS - 1, then BACK. A touch at HOLD_MS starts the wait.
+    guard.holdScored(4000);
+    guard.touched(4000 + BackGuard.HOLD_MS - 1);
+    guard.keyPressed(WatchUi.KEY_ESC, 6100);
+    Test.assert(guard.check(WatchUi.KEY_ESC, 6180) == BACK_NOW);
+    guard.touched(4000 + BackGuard.HOLD_MS);
+    guard.keyPressed(WatchUi.KEY_ESC, 6300);
+    Test.assert(guard.check(WatchUi.KEY_ESC, 6380) == BACK_IGNORE);
+    // A held point is still a touch for a quick BACK waiting: it drops it.
+    guard = new BackGuard();
+    guard.keyPressed(WatchUi.KEY_ESC, 8000);
+    Test.assert(guard.check(WatchUi.KEY_ESC, 8001) == BACK_WAIT);
+    guard.holdScored(8050);
+    Test.assert(!guard.untouchedSince(8001));
+    // System.getTimer() wraps around after about 24.8 days.
+    guard = new BackGuard();
+    var last = 0x7FFFFFFF - 100;
+    guard.holdScored(last);
+    guard.touched(last + 1500);
+    guard.keyPressed(WatchUi.KEY_ESC, last + 1700);
+    Test.assert(guard.check(WatchUi.KEY_ESC, last + 1780) == BACK_NOW);
+    return true;
+}
+
+// Hold BACK, the menu key of the Venu 2, 3, vivoactive 5, D2 Air X10 and Approach S50: BACK's key-down,
+// then the menu key (KEY_MENU, as a key-down or a key). With the flag on, the menu key cancels that
+// key-down, so a BACK key after it (the release) does nothing. Off, as on the watches with UP and DOWN
+// (whose menu key is hold UP), nothing changes.
+(:test)
+function backGuardMenuKeyTest(logger as Logger) as Boolean {
+    var guard = new BackGuard();
+    Test.assert(!guard.menuCancels && guard.wait == BackGuard.WAIT_MS);
+    guard.keyPressed(WatchUi.KEY_ESC, 1000);
+    Test.assert(guard.check(WatchUi.KEY_MENU, 1600) == BACK_NOW && guard.check(WatchUi.KEY_ESC, 1700) == BACK_NOW);
+    guard = new BackGuard();
+    guard.menuCancels = true;
+    guard.keyPressed(WatchUi.KEY_ESC, 1000);
+    Test.assert(guard.check(WatchUi.KEY_MENU, 1600) == BACK_NOW && guard.check(WatchUi.KEY_ESC, 1700) == BACK_IGNORE);
+    guard.keyPressed(WatchUi.KEY_ESC, 2000);
+    guard.keyPressed(WatchUi.KEY_MENU, 2600);
+    Test.assert(guard.check(WatchUi.KEY_ESC, 2700) == BACK_IGNORE);
+    // The next BACK press acts, the BACK button's at once, a quick one after the wait.
+    guard.keyPressed(WatchUi.KEY_ESC, 3000);
+    Test.assert(guard.check(WatchUi.KEY_ESC, 3080) == BACK_NOW);
+    guard.keyPressed(WatchUi.KEY_ESC, 4000);
+    Test.assert(guard.check(WatchUi.KEY_ESC, 4001) == BACK_WAIT);
+    return true;
+}
+
+// The release that ends a hold that scored closes the hold: the release itself starts no wait, a touch
+// after it does, though still within HOLD_MS of the hold. A release past HOLD_MS is a touch like any
+// other, and a release is still a touch for a quick BACK waiting.
+(:test)
+function backGuardHoldReleaseTest(logger as Logger) as Boolean {
+    var guard = new BackGuard();
+    guard.holdScored(1000);
+    guard.touched(1200);
+    guard.holdReleased(1400);
+    guard.keyPressed(WatchUi.KEY_ESC, 1500);
+    Test.assert(guard.check(WatchUi.KEY_ESC, 1580) == BACK_NOW);
+    guard.touched(1700);
+    guard.keyPressed(WatchUi.KEY_ESC, 1900);
+    Test.assert(guard.check(WatchUi.KEY_ESC, 1980) == BACK_IGNORE);
+    guard.keyPressed(WatchUi.KEY_ESC, 1700 + BackGuard.TOUCH_MS);
+    Test.assert(guard.check(WatchUi.KEY_ESC, 1700 + BackGuard.TOUCH_MS + 80) == BACK_NOW);
+    guard = new BackGuard();
+    guard.holdScored(5000);
+    guard.holdReleased(5000 + BackGuard.HOLD_MS);
+    guard.keyPressed(WatchUi.KEY_ESC, 5000 + BackGuard.HOLD_MS + 100);
+    Test.assert(guard.check(WatchUi.KEY_ESC, 5000 + BackGuard.HOLD_MS + 180) == BACK_IGNORE);
+    guard = new BackGuard();
+    guard.holdScored(8000);
+    guard.keyPressed(WatchUi.KEY_ESC, 8100);
+    Test.assert(guard.check(WatchUi.KEY_ESC, 8101) == BACK_WAIT);
+    guard.holdReleased(8150);
+    Test.assert(!guard.untouchedSince(8101));
+    return true;
+}

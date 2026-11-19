@@ -1,5 +1,6 @@
 import Toybox.Lang;
 import Toybox.Test;
+import Toybox.WatchUi;
 
 // From PLAY to the match, with a fake recorder: the sensor lock records
 // nothing and BACK there goes home; START begins recording in the warm-up (lap 1) or, with the Warm-up
@@ -50,6 +51,30 @@ function warmUpStartTest(logger as Logger) as Boolean {
     Test.assert(test.flow.start(TestKit.T0 + 310) == STEP_NONE && test.flow.getMatch() == match);
     TestKit.assertCalls(test.recorder, ["lap"], "one warm-up lap");
     Test.assert(test.session.save() && test.recorder.laps.size() == 2);
+    return true;
+}
+
+(:test)
+function warmUpSwipeMenuTest(logger as Logger) as Boolean {
+    // On the watches without UP and DOWN (the flag on), a swipe up opens the screen's menu, as the menu
+    // key does: the warm-up's while recording, and at the sensor lock the lock's (the debug menu in debug
+    // builds, none in release). Other swipes do nothing. Off, a swipe up does nothing either.
+    var test = new TestKit.Flow(false, true);
+    test.flow.lock();
+    Test.assertEqual(test.flow.swipe(WatchUi.SWIPE_UP), STEP_NONE);
+    test.flow.swipeMenu = true;
+    Test.assertEqual(test.flow.swipe(WatchUi.SWIPE_UP), STEP_LOCK_MENU);
+    Test.assertEqual(test.flow.start(TestKit.T0), STEP_WARM_UP);
+    test.recorder.clear();
+    Test.assertEqual(test.flow.swipe(WatchUi.SWIPE_UP), STEP_MENU);
+    var others = [WatchUi.SWIPE_DOWN, WatchUi.SWIPE_LEFT, WatchUi.SWIPE_RIGHT] as Array<WatchUi.SwipeDirection>;
+    for (var i = 0; i < others.size(); i++) {
+        Test.assertEqual(test.flow.swipe(others[i]), STEP_NONE);
+    }
+    test.flow.swipeMenu = false;
+    Test.assertEqual(test.flow.swipe(WatchUi.SWIPE_UP), STEP_NONE);
+    TestKit.assertCalls(test.recorder, [], "no lap, no stop");
+    Test.assert(test.flow.getMatch() == null && test.session.isRecording());
     return true;
 }
 

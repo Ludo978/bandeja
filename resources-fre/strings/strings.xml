@@ -56,6 +56,9 @@
     <string id="SoundsOn">Événements clés</string>
     <string id="MenuChangeOfEnds">Changement de côté</string>
     <string id="MenuTouchScoring">Score tactile</string>
+    <string id="GestureTap">Toucher</string>
+    <string id="GestureHold">Maintenir</string>
+    <string id="SettingTouchGesture">Geste tactile (Venu, vivoactive, Approach, D2 Air)</string>
     <string id="MenuDebounce">Délai entre appuis</string>
     <string id="Debounce500">0,5 s</string>
     <string id="Debounce800">0,8 s</string>

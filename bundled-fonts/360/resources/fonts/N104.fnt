@@ -1,0 +1,22 @@
+info face="N104" size=104 bold=0 italic=0 charset="" unicode=1 stretchH=100 smooth=1 aa=1 padding=0,0,0,0 spacing=1,1
+common lineHeight=122 base=96 scaleW=260 scaleH=241 pages=1 packed=0
+page id=0 file="N104.png"
+chars count=18
+char id=32 x=236 y=164 width=0 height=0 xoffset=0 yoffset=0 xadvance=24 page=0 chnl=15
+char id=37 x=37 y=0 width=60 height=80 xoffset=3 yoffset=19 xadvance=66 page=0 chnl=15
+char id=43 x=120 y=164 width=45 height=57 xoffset=2 yoffset=33 xadvance=49 page=0 chnl=15
+char id=45 x=207 y=164 width=28 height=15 xoffset=5 yoffset=57 xadvance=38 page=0 chnl=15
+char id=46 x=166 y=164 width=20 height=19 xoffset=5 yoffset=79 xadvance=30 page=0 chnl=15
+char id=47 x=0 y=0 width=36 height=83 xoffset=-2 yoffset=21 xadvance=34 page=0 chnl=15
+char id=48 x=192 y=0 width=46 height=79 xoffset=3 yoffset=20 xadvance=53 page=0 chnl=15
+char id=49 x=191 y=84 width=31 height=77 xoffset=7 yoffset=20 xadvance=53 page=0 chnl=15
+char id=50 x=94 y=84 width=48 height=78 xoffset=2 yoffset=19 xadvance=53 page=0 chnl=15
+char id=51 x=98 y=0 width=47 height=80 xoffset=2 yoffset=19 xadvance=53 page=0 chnl=15
+char id=52 x=0 y=164 width=49 height=76 xoffset=2 yoffset=21 xadvance=53 page=0 chnl=15
+char id=53 x=143 y=84 width=47 height=78 xoffset=3 yoffset=21 xadvance=53 page=0 chnl=15
+char id=54 x=0 y=84 width=46 height=79 xoffset=4 yoffset=20 xadvance=53 page=0 chnl=15
+char id=55 x=50 y=164 width=48 height=76 xoffset=2 yoffset=21 xadvance=53 page=0 chnl=15
+char id=56 x=146 y=0 width=45 height=80 xoffset=4 yoffset=19 xadvance=53 page=0 chnl=15
+char id=57 x=47 y=84 width=46 height=79 xoffset=3 yoffset=19 xadvance=53 page=0 chnl=15
+char id=58 x=99 y=164 width=20 height=60 xoffset=5 yoffset=38 xadvance=29 page=0 chnl=15
+char id=183 x=187 y=164 width=19 height=19 xoffset=5 yoffset=51 xadvance=30 page=0 chnl=15

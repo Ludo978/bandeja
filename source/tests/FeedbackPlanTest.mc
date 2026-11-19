@@ -284,8 +284,11 @@ function feedbackProfilesTest(logger as Logger) as Boolean {
     Test.assert(profiles[1].dutyCycle == 0 && profiles[1].length == 250 && profiles[2].dutyCycle == 100);
     Test.assertEqual((Feedback.vibeProfiles([150, 250, 150, 250, 150, 250, 150, 250]) as Array).size(), 8);
     Test.assert(Feedback.vibeProfiles([150, 250, 150, 250, 150, 250, 150, 250, 150]) == null && Feedback.vibeProfiles([]) == null);
-    var tones = Feedback.toneProfiles([2500, 200, 4000, 300]);
-    Test.assert(tones.size() == 2 && tones[0].frequency == 2500 && tones[0].duration == 200 && tones[1].frequency == 4000);
+    // Tones only where the watch has them (Attention.ToneProfile): Feedback plays none elsewhere.
+    if (Attention has :ToneProfile) {
+        var tones = Feedback.toneProfiles([2500, 200, 4000, 300]);
+        Test.assert(tones.size() == 2 && tones[0].frequency == 2500 && tones[0].duration == 200 && tones[1].frequency == 4000);
+    }
     var channels = Feedback.channels();
     var device = System.getDeviceSettings();
     Test.assert(channels.vibration == Settings.getVibration() && channels.sounds == Settings.isSoundsOn());

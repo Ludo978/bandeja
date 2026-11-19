@@ -9,8 +9,9 @@ import Toybox.WatchUi;
 // BACK and a swipe right bring the same toast while recording, and go home at the lock. Hold UP
 // while recording: Start match / Discard / Settings. Taps and other swipes do nothing. The toast
 // never takes a press: every press keeps acting as above while it shows. Hold DOWN is the watch's.
-// Debug builds, at the lock: hold UP opens the debug menu (DebugMenu: the score screen fixtures, a
-// session the watch refuses), a tap opens the design test screen.
+// On the watches without UP and DOWN (InputFlags), a swipe up opens what hold UP opens, and their own
+// menu key too. Debug builds, at the lock: hold UP (or that swipe up) opens the debug menu (DebugMenu:
+// the score screen fixtures, a session the watch refuses), a tap opens the design test screen.
 class WarmUpDelegate extends WatchUi.BehaviorDelegate {
 
     private var _view as WarmUpView;
@@ -21,7 +22,8 @@ class WarmUpDelegate extends WatchUi.BehaviorDelegate {
     }
 
     // The behaviors come first: START and a tap both give onSelect, UP and a swipe down
-    // onPreviousPage, DOWN and a swipe up onNextPage. Passed on to onKey, onTap and onSwipe.
+    // onPreviousPage, DOWN and a swipe up onNextPage. Passed on to onKey, onTap and onSwipe: DOWN gives
+    // the toast, and only the swipe up the menu.
     function onSelect() as Boolean {
         return false;
     }
@@ -68,6 +70,7 @@ class WarmUpDelegate extends WatchUi.BehaviorDelegate {
     }
 
     function onSwipe(swipeEvent as WatchUi.SwipeEvent) as Boolean {
+        act(_view.flow.swipe(swipeEvent.getDirection()));
         return true;
     }
 
@@ -92,6 +95,10 @@ class WarmUpDelegate extends WatchUi.BehaviorDelegate {
             showSessionError(getSessionManager());
         } else if (step == STEP_HOME) {
             WatchUi.popView(WatchUi.SLIDE_RIGHT);
+        } else if (step == STEP_MENU) {
+            WarmUpMenu.open(self);
+        } else if (step == STEP_LOCK_MENU) {
+            debugMenu();
         }
     }
 

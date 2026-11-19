@@ -477,21 +477,255 @@ function scoreInputChangeOfEndsTest(logger as Logger) as Boolean {
     return true;
 }
 
+// The watches without UP and DOWN (InputFlags): touch scoring always on, by tap or by hold (the
+// Touch scoring setting's gesture); BACK on the data and stats pages brings the score page back; a swipe
+// up opens the match menu. Each rule is a flag the tests set, off on the watches with UP and DOWN.
+
+(:test)
+function scoreInputHoldTest(logger as Logger) as Boolean {
+    // Flag off (the watches with UP and DOWN): the gesture changes nothing, a hold is a touch, a tap scores
+    // only with touch scoring on.
+    var rig = new TestKit.Rig(new MatchConfig(), "", false);
+    var input = rig.input;
+    input.touchGesture = GESTURE_HOLD;
+    Test.assert(rig.hold(100, 500) == INPUT_NONE && rig.tap(100, 600) == INPUT_NONE);
+    input.touchScoring = true;
+    Test.assert(rig.hold(300, 700) == INPUT_NONE && rig.tap(300, 800) == INPUT_POINT);
+    rig.assertPoints(1, 0, "flag off");
+
+    // On, by hold, whatever the Touch scoring setting: a hold on the score page is a point press for the
+    // half held, THEM above the middle, US from it down; a tap does nothing, with no toast.
+    rig = ScoreInputTests.touchOnly(new MatchConfig(), GESTURE_HOLD);
+    input = rig.input;
+    Test.assert(!input.touchScoring);
+    Test.assert(rig.hold(207, 1000) == INPUT_POINT && input.team == TEAM_THEM && input.won == WON_POINT && input.toast == null);
+    Test.assert(rig.release(1300) == INPUT_NONE && rig.tap(300, 2000) == INPUT_NONE && input.toast == null);
+    Test.assert(rig.hold(208, 2000) == INPUT_POINT && input.team == TEAM_US);
+    // One hold, one point: hold events after it, its finger still down, do nothing until it lifts or
+    // BackGuard.HOLD_MS has passed (a watch may never send the release).
+    Test.assert(rig.hold(300, 2900) == INPUT_NONE && rig.hold(100, 2000 + BackGuard.HOLD_MS - 1) == INPUT_NONE);
+    Test.assert(rig.hold(100, 2000 + BackGuard.HOLD_MS) == INPUT_POINT && input.team == TEAM_THEM);
+    rig.assertPoints(1, 2, "one point a hold");
+    // The press delay of every point press: a hold within it of the last point that counted is ignored,
+    // and doesn't hold the next one back.
+    Test.assert(rig.release(4100) == INPUT_NONE && rig.hold(300, 4799) == INPUT_NONE);
+    Test.assert(rig.hold(300, 4800) == INPUT_POINT && input.team == TEAM_US);
+    // An undo ends both the press delay and the hold: the other half held at once, with no release, scores.
+    Test.assert(rig.press(WatchUi.KEY_ESC, 5000) == INPUT_UNDO && input.toast == Rez.Strings.UndonePointUs);
+    Test.assert(rig.hold(100, 5100) == INPUT_POINT && input.team == TEAM_THEM);
+    rig.assertPoints(1, 3, "press delay and undo");
+    // A hold on the data page or the stats page is a touch.
+    Test.assert(rig.release(5200) == INPUT_NONE && rig.swipe(WatchUi.SWIPE_LEFT, 7000) == INPUT_NEXT_PAGE);
+    Test.assert(rig.hold(300, 7100) == INPUT_NONE && rig.swipe(WatchUi.SWIPE_LEFT, 7200) == INPUT_NEXT_PAGE);
+    Test.assert(rig.hold(300, 7300) == INPUT_NONE && rig.motion.page == PAGE_STATS);
+    rig.assertPoints(1, 3, "other pages");
+    // While paused, on the score page, "Paused", as a tap or a button. START resumes.
+    Test.assert(rig.swipe(WatchUi.SWIPE_RIGHT, 7400) == INPUT_PREVIOUS_PAGE && rig.swipe(WatchUi.SWIPE_RIGHT, 7500) == INPUT_PREVIOUS_PAGE);
+    Test.assert(rig.press(WatchUi.KEY_ENTER, 8000) == INPUT_PAUSE);
+    Test.assert(rig.hold(300, 9000) == INPUT_TOAST && input.toast == Rez.Strings.ToastPaused && rig.motion.page == PAGE_SCORE);
+    Test.assert(rig.release(9100) == INPUT_NONE && rig.press(WatchUi.KEY_ENTER, 9500) == INPUT_RESUME);
+    rig.assertPoints(1, 3, "paused");
+
+    // By tap: taps score as with touch scoring on, and a hold is a touch.
+    rig = ScoreInputTests.touchOnly(new MatchConfig(), GESTURE_TAP);
+    Test.assert(rig.hold(100, 1000) == INPUT_NONE && rig.tap(100, 1100) == INPUT_POINT && rig.input.team == TEAM_THEM);
+    rig.assertPoints(0, 1, "by tap");
+    return true;
+}
+
+(:test)
+function scoreInputHoldOverlayTest(logger as Logger) as Boolean {
+    // A hold that wins a game brings its overlay; a hold during it ends it and scores once, one within
+    // the press delay leaves it up. The match point: its overlay, then "Match over" for a hold.
+    var rig = ScoreInputTests.touchOnly(new MatchConfig(), GESTURE_HOLD);
+    rig.play(ScoreMotionTests.GAME_POINT);
+    Test.assert(rig.hold(300, 1000) == INPUT_POINT && rig.input.won == WON_GAME);
+    ScoreMotionTests.assertOverlay(rig.motion, 1000, TEAM_US, WON_GAME, false, 2, [5, 3]);
+    Test.assert(rig.release(1200) == INPUT_NONE && rig.hold(100, 1500) == INPUT_NONE && rig.motion.getOverlayAt(1500) != null);
+    Test.assert(rig.release(1600) == INPUT_NONE && rig.hold(100, 2000) == INPUT_POINT && rig.ended != null);
+    Test.assert(rig.motion.getOverlayAt(2000) == null && rig.input.team == TEAM_THEM);
+    rig = ScoreInputTests.touchOnly(new MatchConfig(), GESTURE_HOLD);
+    rig.play(ScoreMotionTests.MATCH_POINT);
+    Test.assert(rig.hold(300, 1000) == INPUT_POINT && rig.input.won == WON_MATCH);
+    Test.assert(rig.release(1200) == INPUT_NONE);
+    Test.assert(rig.hold(100, 2000) == INPUT_TOAST && rig.input.toast == Rez.Strings.ToastMatchOver);
+    return true;
+}
+
+(:test)
+function scoreInputHoldBackTest(logger as Logger) as Boolean {
+    // BACK right after a held point undoes it, as after a tapped one: the hold's own touches (its
+    // touch-down before it, its drags, its release) don't start the BACK guard's 800 ms wait, within
+    // BackGuard.HOLD_MS of it, so with no release at all too. A touch after that starts it again. The BACK
+    // button: its key 80 ms after its key-down.
+    var rig = ScoreInputTests.touchOnly(new MatchConfig(), GESTURE_HOLD);
+    var input = rig.input;
+    // Before its release.
+    Test.assert(rig.touch(400) == INPUT_NONE && rig.hold(100, 1000) == INPUT_POINT);
+    Test.assertEqual(ScoreInputTests.back(rig, 1300, 80), INPUT_UNDO);
+    rig.assertPoints(0, 0, "BACK while held");
+    // After drags and its release.
+    Test.assert(rig.hold(300, 3000) == INPUT_POINT && rig.touch(3100) == INPUT_NONE && rig.touch(3300) == INPUT_NONE);
+    Test.assert(rig.release(3600) == INPUT_NONE);
+    Test.assertEqual(ScoreInputTests.back(rig, 3800, 80), INPUT_UNDO);
+    rig.assertPoints(0, 0, "BACK after the release");
+    // No release: a drag at the end of the window, then BACK.
+    Test.assert(rig.hold(300, 6000) == INPUT_POINT && rig.touch(6000 + BackGuard.HOLD_MS - 1) == INPUT_NONE);
+    Test.assertEqual(ScoreInputTests.back(rig, 6000 + BackGuard.HOLD_MS + 100, 80), INPUT_UNDO);
+    rig.assertPoints(0, 0, "no release");
+    // A touch past the window starts the wait: BACK within 800 ms of it does nothing, after them it undoes.
+    Test.assert(rig.hold(100, 10000) == INPUT_POINT && rig.release(10200) == INPUT_NONE);
+    Test.assertEqual(rig.touch(10000 + BackGuard.HOLD_MS), INPUT_NONE);
+    Test.assertEqual(ScoreInputTests.back(rig, 10000 + BackGuard.HOLD_MS + 300, 80), INPUT_NONE);
+    rig.assertPoints(0, 1, "a later touch");
+    Test.assertEqual(ScoreInputTests.back(rig, 10000 + BackGuard.HOLD_MS + BackGuard.TOUCH_MS, 80), INPUT_UNDO);
+    // The watch's edge swipe: its quick BACK key, then its drags; no hold scores within 800 ms of that key.
+    input.back.keyPressed(WatchUi.KEY_ESC, 20000);
+    Test.assertEqual(input.back.check(WatchUi.KEY_ESC, 20001), BACK_WAIT);
+    Test.assert(rig.touch(20030) == INPUT_NONE && rig.hold(300, 20500) == INPUT_NONE && rig.release(20600) == INPUT_NONE);
+    rig.assertPoints(0, 0, "edge swipe");
+    Test.assert(rig.hold(300, 20801) == INPUT_POINT && input.team == TEAM_US);
+    // The simulator's BACK (its key on its key-down) waits the guard's wait on these watches, then undoes.
+    Test.assertEqual(input.back.wait, BackGuard.LONG_WAIT_MS);
+    Test.assertEqual(ScoreInputTests.back(rig, 21000, 0), INPUT_UNDO);
+    rig.assertPoints(0, 0, "the simulator's BACK");
+    return true;
+}
+
+(:test)
+function scoreInputPageBackTest(logger as Logger) as Boolean {
+    // With the flag on, BACK on the data page and on the stats page brings the score page back and undoes
+    // nothing (no toast), also while paused; on the score page it undoes. Off (the watches with UP and DOWN,
+    // where swipes and UP and DOWN turn the pages), BACK on those pages undoes, the score page coming
+    // back with its toast. Through the BACK guard as the delegate passes it.
+    for (var on = 0; on < 2; on++) {
+        var rig = new TestKit.Rig(new MatchConfig(), "", false);
+        var input = rig.input;
+        input.pageBack = on == 1;
+        Test.assertEqual(rig.press(WatchUi.KEY_DOWN, 1000), INPUT_POINT);
+        Test.assert(rig.swipe(WatchUi.SWIPE_LEFT, 2000) == INPUT_NEXT_PAGE && rig.motion.page == PAGE_DATA);
+        var back = ScoreInputTests.back(rig, 3000, 80);
+        Test.assert(rig.motion.page == PAGE_SCORE);
+        if (on == 0) {
+            Test.assert(back == INPUT_UNDO && input.toast == Rez.Strings.UndonePointUs);
+            rig.assertPoints(0, 0, "flag off");
+            continue;
+        }
+        Test.assert(back == INPUT_SCORE_PAGE && input.toast == null && input.undone == null);
+        Test.assert(rig.swipe(WatchUi.SWIPE_LEFT, 4000) == INPUT_NEXT_PAGE && rig.swipe(WatchUi.SWIPE_LEFT, 4100) == INPUT_NEXT_PAGE);
+        Test.assert(rig.motion.page == PAGE_STATS && ScoreInputTests.back(rig, 5000, 80) == INPUT_SCORE_PAGE);
+        Test.assert(rig.motion.page == PAGE_SCORE && rig.motion.isIdle(INPUT_SCORE_PAGE));
+        rig.assertPoints(1, 0, "the score page back");
+        Test.assert(rig.press(WatchUi.KEY_ENTER, 6000) == INPUT_PAUSE && rig.swipe(WatchUi.SWIPE_LEFT, 6100) == INPUT_NEXT_PAGE);
+        Test.assert(rig.press(WatchUi.KEY_ESC, 6200) == INPUT_SCORE_PAGE && rig.motion.page == PAGE_SCORE);
+        Test.assert(rig.press(WatchUi.KEY_ESC, 6300) == INPUT_TOAST && input.toast == Rez.Strings.ToastPaused);
+        Test.assert(rig.press(WatchUi.KEY_ENTER, 6400) == INPUT_RESUME);
+        Test.assert(ScoreInputTests.back(rig, 7000, 80) == INPUT_UNDO && input.toast == Rez.Strings.UndonePointUs);
+        rig.assertPoints(0, 0, "undone on the score page");
+    }
+    return true;
+}
+
+(:test)
+function scoreInputSwipeMenuTest(logger as Logger) as Boolean {
+    // With the flag on, a swipe up opens the match menu from the score page, the data page and the stats
+    // page, the page staying, also while paused; it never scores. During a game's overlay it ends it, as
+    // hold UP does. Off, a swipe up does nothing.
+    var rig = new TestKit.Rig(new MatchConfig(), "", false);
+    Test.assertEqual(rig.swipe(WatchUi.SWIPE_UP, 500), INPUT_NONE);
+    rig.input.swipeMenu = true;
+    var pages = [PAGE_SCORE, PAGE_DATA, PAGE_STATS] as Array<ScorePage>;
+    for (var i = 0; i < pages.size(); i++) {
+        Test.assert(rig.motion.page == pages[i] && rig.swipe(WatchUi.SWIPE_UP, 1000 + i * 100) == INPUT_MATCH_MENU);
+        Test.assert(rig.motion.page == pages[i] && rig.swipe(WatchUi.SWIPE_DOWN, 1050 + i * 100) == INPUT_NONE);
+        rig.swipe(WatchUi.SWIPE_LEFT, 1080 + i * 100);
+    }
+    Test.assert(rig.motion.page == PAGE_STATS && rig.swipe(WatchUi.SWIPE_RIGHT, 2000) == INPUT_PREVIOUS_PAGE);
+    Test.assert(rig.swipe(WatchUi.SWIPE_RIGHT, 2100) == INPUT_PREVIOUS_PAGE && rig.press(WatchUi.KEY_ENTER, 3000) == INPUT_PAUSE);
+    Test.assert(rig.swipe(WatchUi.SWIPE_UP, 3100) == INPUT_MATCH_MENU && rig.session.isPaused());
+    rig.assertPoints(0, 0, "menus");
+    rig = new TestKit.Rig(new MatchConfig(), "", false);
+    rig.play(ScoreMotionTests.GAME_POINT);
+    rig.input.swipeMenu = true;
+    Test.assert(rig.press(WatchUi.KEY_DOWN, 1000) == INPUT_POINT && rig.input.won == WON_GAME);
+    Test.assert(rig.swipe(WatchUi.SWIPE_UP, 1200) == INPUT_MATCH_MENU && rig.ended != null && rig.motion.getOverlayAt(1200) == null);
+    return true;
+}
+
+(:test)
+function scoreInputHoldReleaseTest(logger as Logger) as Boolean {
+    // The release that ends a hold that scored closes the hold: a touch after it, though within
+    // BackGuard.HOLD_MS of the hold, is a touch like any other and holds BACK back for 800 ms. A release
+    // with no hold before it is a touch too.
+    var rig = ScoreInputTests.touchOnly(new MatchConfig(), GESTURE_HOLD);
+    Test.assert(rig.hold(300, 1000) == INPUT_POINT && rig.release(1300) == INPUT_NONE);
+    Test.assertEqual(rig.touch(1500), INPUT_NONE);
+    Test.assertEqual(ScoreInputTests.back(rig, 1700, 80), INPUT_NONE);
+    rig.assertPoints(1, 0, "a touch after the release");
+    Test.assertEqual(ScoreInputTests.back(rig, 1500 + BackGuard.TOUCH_MS, 80), INPUT_UNDO);
+    rig.assertPoints(0, 0, "after the wait");
+    Test.assertEqual(rig.release(5000), INPUT_NONE);
+    Test.assertEqual(ScoreInputTests.back(rig, 5200, 80), INPUT_NONE);
+    return true;
+}
+
+(:test)
+function scoreInputPageBackGuardTest(logger as Logger) as Boolean {
+    // With the flag on, a BACK key on the data page or the stats page acts whatever the BACK guard makes
+    // of it (no key-down before it, right after a touch, or too quick to be a finger): it undoes nothing
+    // there, so a watch that sends a swipe right as a BACK key still goes back. On the score page the
+    // guard decides, as it does on every page with the flag off.
+    var rig = ScoreInputTests.touchOnly(new MatchConfig(), GESTURE_TAP);
+    var input = rig.input;
+    Test.assertEqual(rig.tap(300, 1000), INPUT_POINT);
+    // The data page: a BACK key with no key-down, 100 ms after the swipe that turned to it.
+    Test.assert(rig.swipe(WatchUi.SWIPE_LEFT, 2000) == INPUT_NEXT_PAGE && rig.motion.page == PAGE_DATA);
+    Test.assertEqual(input.keyCheck(WatchUi.KEY_ESC, rig.motion.page, 2100), BACK_NOW);
+    Test.assert(rig.press(WatchUi.KEY_ESC, 2100) == INPUT_SCORE_PAGE && rig.motion.page == PAGE_SCORE);
+    // The stats page: a quick BACK, its key with its key-down, acts at once, with no wait.
+    Test.assert(rig.swipe(WatchUi.SWIPE_LEFT, 4000) == INPUT_NEXT_PAGE && rig.swipe(WatchUi.SWIPE_LEFT, 4100) == INPUT_NEXT_PAGE);
+    input.back.keyPressed(WatchUi.KEY_ESC, 6000);
+    Test.assertEqual(input.keyCheck(WatchUi.KEY_ESC, rig.motion.page, 6000), BACK_NOW);
+    Test.assert(rig.press(WatchUi.KEY_ESC, 6000) == INPUT_SCORE_PAGE && rig.motion.page == PAGE_SCORE);
+    rig.assertPoints(1, 0, "nothing undone");
+    // That quick key is still the edge swipe's for the taps after it: none scores for 800 ms.
+    Test.assertEqual(rig.tap(300, 6100), INPUT_NONE);
+    // The score page: the guard decides. No key-down, or a touch less than 800 ms before: nothing.
+    Test.assertEqual(input.keyCheck(WatchUi.KEY_ESC, rig.motion.page, 8000), BACK_IGNORE);
+    Test.assertEqual(rig.touch(9000), INPUT_NONE);
+    Test.assertEqual(ScoreInputTests.back(rig, 9100, 80), INPUT_NONE);
+    rig.assertPoints(1, 0, "the score page");
+    // Flag off: the guard decides on the data page too.
+    rig = new TestKit.Rig(new MatchConfig(), "", false);
+    Test.assert(rig.swipe(WatchUi.SWIPE_LEFT, 12000) == INPUT_NEXT_PAGE && rig.motion.page == PAGE_DATA);
+    Test.assertEqual(rig.input.keyCheck(WatchUi.KEY_ESC, rig.motion.page, 13000), BACK_IGNORE);
+    return true;
+}
+
 (:test)
 module ScoreInputTests {
 
     // A BACK press as ScoreDelegate passes it: its key-down at `at`, its key held ms later, through the
-    // BACK guard, then to the input at once (BACK_NOW) or WAIT_MS later when no touch came (BACK_WAIT).
-    // INPUT_NONE when the guard drops it.
+    // BACK guard on the page showing (ScoreInput.keyCheck()), then to the input at once (BACK_NOW) or the
+    // guard's wait later when no touch came (BACK_WAIT). INPUT_NONE when the guard drops it.
     function back(rig as TestKit.Rig, at as Number, held as Number) as ScoreAction {
         var input = rig.input;
         input.back.keyPressed(WatchUi.KEY_ESC, at);
-        var check = input.back.check(WatchUi.KEY_ESC, at + held);
+        var check = input.keyCheck(WatchUi.KEY_ESC, rig.motion.page, at + held);
         if (check == BACK_NOW) {
             return rig.press(WatchUi.KEY_ESC, at + held);
         } else if (check == BACK_WAIT && input.back.untouchedSince(at + held)) {
-            return rig.press(WatchUi.KEY_ESC, at + held + BackGuard.WAIT_MS);
+            return rig.press(WatchUi.KEY_ESC, at + held + input.back.wait);
         }
         return INPUT_NONE;
+    }
+
+    // A rig on the watches without UP and DOWN (InputFlags): touch scoring always on, by tap or hold.
+    function touchOnly(config as MatchConfig, gesture as TouchGesture) as TestKit.Rig {
+        var rig = new TestKit.Rig(config, "", false);
+        InputFlags.setScore(rig.input, true);
+        InputFlags.setMotion(rig.motion, true);
+        rig.input.touchGesture = gesture;
+        return rig;
     }
 }

@@ -16,6 +16,8 @@
     <property id="changeOfEnds" type="boolean">true</property>
     <!-- Touch scoring -->
     <property id="touchScoring" type="boolean">false</property>
+    <!-- TouchGesture, touch scoring on the watches without UP and DOWN: 0 Tap, 1 Hold -->
+    <property id="touchGesture" type="number">0</property>
     <!-- ThemeSetting: 0 Court, 1 Clay, 2 Grass -->
     <property id="theme" type="number">0</property>
     <!-- The press delay, in milliseconds: 500, 800 or 1200 -->

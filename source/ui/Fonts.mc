@@ -14,10 +14,13 @@ enum FontStyle {
 
 // Fonts by style and em size, loaded once and kept: a vector font is expensive to load, so never
 // per frame. The watches have RobotoCondensedBold (STYLE_NUMBER, STYLE_BOLD) and
-// RobotoCondensedRegular (STYLE_REGULAR) as scalable fonts from API 4.2.1, but for the Descent G2 and
-// the Instinct 3 AMOLED, which have none: their builds bundle the same faces as bitmap fonts
-// (BundledFonts, from bundled-fonts/), and each size takes the bundled size nearest to it. Without
-// either (the FR265 launched with 4.2.0), each size falls back to the system font closest in height.
+// RobotoCondensedRegular (STYLE_REGULAR) as scalable fonts from API 4.2.1, but for those built with
+// bundled fonts (monkey.jungle): the Descent G2, the Instinct 3 AMOLED, the Venu 2, 2 Plus and 2S, the
+// vivoactive 5, the D2 Air X10 and the Approach S50 have no scalable fonts, and the Venu 3 and 3S none
+// in these faces (their getVectorFont gives null for them). Their builds bundle the same faces as
+// bitmap fonts (BundledFonts, from bundled-fonts/, one set per screen size), each size taking the
+// bundled size nearest to it, and never ask for a vector font. Without either (the FR265 launched with
+// 4.2.0), each size falls back to the system font closest in height.
 module Fonts {
 
     const FACE_BOLD = "RobotoCondensedBold";
@@ -45,9 +48,15 @@ module Fonts {
         return font;
     }
 
-    // Whether get() loads vector fonts.
+    // Whether get() loads vector fonts: never on the watches built with bundled fonts.
+    (:noBundledFonts)
     function isVector() as Boolean {
         return _vector && (Graphics has :getVectorFont);
+    }
+
+    (:bundledFonts)
+    function isVector() as Boolean {
+        return false;
     }
 
     // Debug builds: false makes get() return the fallback fonts (design test screen, tests).

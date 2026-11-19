@@ -241,11 +241,17 @@ function glanceSizeTest(logger as Logger) as Boolean {
         [["No matches yet"], 0],
         [["Aucun match"], 0]
     ];
-    // The line keeps clear of the Instinct 3 AMOLED's window (lineWidth()): there it only has to fit.
+    // The line keeps clear of the Instinct 3 AMOLED's window (lineWidth()): there it only has to fit. The
+    // watches of 1.2 have areas taller for their width, where a line whole at full size elsewhere may
+    // shrink (measured: a two-set match in French on the Venu 2, 2 Plus, 2S and 3S, the vivoactive 5,
+    // the D2 Air X10 and the Approach S50, by one or two pixels of em size).
     var lineWidth = BandejaGlance.lineWidth(dc);
     for (var i = 0; i < cases.size(); i++) {
         var lines = cases[i][0] as Array<String>;
         var shown = lineWidth == width ? cases[i][1] as Number : 3;
+        if (shown == 0 && GlanceTests.isLater()) {
+            shown = 1;
+        }
         var fitted = BandejaGlance.fit(dc, lines, size);
         Test.assertMessage(dc.getTextWidthInPixels(lines[fitted[0]], fitted[2]) <= lineWidth, "case " + i);
         if (shown == 0) {
@@ -255,6 +261,51 @@ function glanceSizeTest(logger as Logger) as Boolean {
         } else if (shown == 2) {
             Test.assertMessage(fitted[0] == 1 && fitted[1] == size, "case " + i);
         }
+    }
+    return true;
+}
+
+(:test :noScoreButtons)
+function glanceRoundEdgeTest(logger as Logger) as Boolean {
+    // The watches added in 1.2 draw their glance at the top of the round screen, and their areas reach
+    // its right edge: the line ends 4 px inside the circle at the top of its capitals. The geometry first:
+    // a 416 px screen (radius 208), the area's left at x 128 and its top at y 8. A row 78.6 px down the
+    // area is 121.4 px above the screen's middle, where the circle is 168.9 px wide each side of it: it
+    // ends at x 376.9, 248.9 px into the area, 244 with the margin. From the screen's middle down the
+    // circle's own right end, 416: 284 px into the area with the margin.
+    Test.assertEqual(BandejaGlance.roundEnd(416, 128, 8, 78.6), 244);
+    Test.assertEqual(BandejaGlance.roundEnd(416, 128, 8, 200.0), 284);
+    Test.assertEqual(BandejaGlance.roundEnd(416, 128, 8, 300.0), 284);
+    // A higher row ends sooner, and so does an area further right.
+    Test.assert(BandejaGlance.roundEnd(416, 128, 8, 60.0) < 244 && BandejaGlance.roundEnd(416, 138, 8, 78.6) == 234);
+    // Each 1.2 watch's area has its place on the screen; another area has none, and no limit.
+    var later = GlanceTests.laterAreas().values();
+    for (var i = 0; i < later.size(); i++) {
+        Test.assertMessage(BandejaGlance.areaOrigin(later[i][0], later[i][1]) != null, later[i][0] + " x " + later[i][1]);
+    }
+    Test.assert(BandejaGlance.areaOrigin(275, 120) == null && BandejaGlance.roundLimit(275, 120) == 275);
+    var venu2 = BandejaGlance.areaOrigin(288, 133) as [Number, Number];
+    Test.assert(venu2[0] == 128 && venu2[1] == 8);
+    // This watch: the line's width is the area's or the circle's end, whichever comes first, never
+    // less than half the area, and every line the glance shows ends within it.
+    var area = GlanceTests.area();
+    var width = area[0];
+    var height = area[1];
+    var dc = (Graphics.createBufferedBitmap({:width => width, :height => height}).get() as Graphics.BufferedBitmap).getDc();
+    var limit = BandejaGlance.roundLimit(width, height);
+    var lineWidth = BandejaGlance.lineWidth(dc);
+    Test.assertEqual(lineWidth, limit < width ? limit : width);
+    Test.assert(lineWidth > width / 2 && lineWidth <= width);
+    var origin = BandejaGlance.areaOrigin(width, height) as [Number, Number];
+    var row = BandejaGlance.top(height)
+        + (BandejaGlance.LINE_BASELINE - BandejaGlance.CAP_HEIGHT * BandejaGlance.LINE_SIZE) * BandejaGlance.scale(height);
+    Test.assertEqual(limit, BandejaGlance.roundEnd(System.getDeviceSettings().screenWidth, origin[0], origin[1], row));
+    var size = BandejaGlance.LINE_SIZE * BandejaGlance.scale(height);
+    var shown = [["Dernier : V 6-4 6-3 · 1h08", "Dernier : V 2 - 0 · 1h08"], ["Last: W 6-4 6-3 · 1h08", "Last: W 2 - 0 · 1h08"],
+        ["Dernier : D 0-6 4-6 · 58 min", "Dernier : D 0 - 2 · 58 min"]];
+    for (var i = 0; i < shown.size(); i++) {
+        var fitted = BandejaGlance.fit(dc, shown[i], size);
+        Test.assertMessage(dc.getTextWidthInPixels(shown[i][fitted[0]], fitted[2]) <= lineWidth, "line " + i);
     }
     return true;
 }
@@ -301,7 +352,27 @@ module GlanceTests {
             "006-B4315-00" => [299, 148], "006-B4954-00" => [359, 130], "006-B4588-00" => [248, 103],
             "006-B4586-00" => [320, 99], "006-B4587-00" => [346, 106]} as Dictionary<String, [Number, Number]>;
         var area = areas[System.getDeviceSettings().partNumber];
+        if (area == null) {
+            area = laterAreas()[System.getDeviceSettings().partNumber];
+        }
         return area != null ? area : [275, 120];
+    }
+
+    // The areas of the watches 1.2 adds, the watches without UP and DOWN (their device files): Venu 2, 2 Plus,
+    // 2S, 3, 3S, 4 41 and 45 mm, vivoactive 5 and 6, D2 Air X10, Approach S50, S70 42 and 47 mm, S72 43 and
+    // 47 mm.
+    function laterAreas() as Dictionary<String, [Number, Number]> {
+        return {"006-B3703-00" => [288, 133], "006-B3851-00" => [288, 133], "006-B3704-00" => [249, 115],
+            "006-B4260-00" => [303, 164], "006-B4261-00" => [260, 141], "006-B4644-00" => [274, 128],
+            "006-B4643-00" => [318, 150], "006-B4426-00" => [260, 141], "006-B4625-00" => [274, 146],
+            "006-B4125-00" => [288, 133], "006-B4656-00" => [260, 141], "006-B4233-00" => [248, 103],
+            "006-B4234-00" => [274, 103], "006-B4874-00" => [292, 130], "006-B4875-00" => [318, 150]}
+            as Dictionary<String, [Number, Number]>;
+    }
+
+    // This watch is one 1.2 adds.
+    function isLater() as Boolean {
+        return laterAreas().hasKey(System.getDeviceSettings().partNumber);
     }
 
     // The lines as one string, to compare them.

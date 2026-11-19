@@ -9,7 +9,9 @@ import Toybox.WatchUi;
 // this shows it and opens the next screens through MatchFlow. The data page and the stats page are
 // the view's second and third pages, with this same input: the view turns between them.
 // With touch scoring on, a tap on the score page is a point press, scored from onTap only:
-// never from a touch-down, a drag, a hold or a swipe.
+// never from a touch-down, a drag, a hold or a swipe. On the watches without UP and DOWN (InputFlags)
+// touch scoring is always on, by tap or by the watch's touch hold (onHold, the setting's gesture), BACK
+// on the data and stats pages brings the score page back, and a swipe up opens the match menu.
 //
 // Every input that does something also ends the game / set overlay: the press counts
 // once, as it would without it. After a change the redraw is requested first (the score on
@@ -32,6 +34,7 @@ class ScoreDelegate extends WatchUi.InputDelegate {
         _view = view;
         _match = match;
         _input = new ScoreInput(match, getSessionManager());
+        InputFlags.setScore(_input, InputFlags.touchOnly());
         _back = _input.back;
     }
 
@@ -46,31 +49,33 @@ class ScoreDelegate extends WatchUi.InputDelegate {
         return false;
     }
 
-    // UP, DOWN and BACK arrive on release on the watch, START on press; hold UP as KEY_MENU. The
-    // edge swipe's fake BACK does nothing (BackGuard): only the BACK button undoes. A quick BACK waits
-    // for the swipe's drags on the view's timer (backDue()). The press delay is read at each key, so a
-    // change in the Settings menu applies to the next press.
+    // UP, DOWN and BACK arrive on release on the watch, START on press; hold UP as KEY_MENU (hold BACK,
+    // or a button of its own, on the watches without UP and DOWN). The edge swipe's fake BACK does
+    // nothing (BackGuard): only the BACK button undoes, on the score page (ScoreInput.pageKey()); on
+    // those watches' data and stats pages any BACK key brings the score page back (ScoreInput.keyCheck()).
+    // A quick BACK waits for the swipe's drags on the view's timer (backDue()). The press delay is read
+    // at each key, so a change in the Settings menu applies to the next press.
     function onKey(keyEvent as WatchUi.KeyEvent) as Boolean {
         var key = keyEvent.getKey();
         var now = System.getTimer();
-        var check = _back.check(key, now);
+        var check = _input.keyCheck(key, _view.getPage(), now);
         InputLog.add("key", key, keyEvent.getType(), check == BACK_NOW ? "ok" : check == BACK_WAIT ? "wait" : "blocked");
         if (check == BACK_NOW) {
             _input.debounce = Settings.getDebounce();
-            act(_input.key(key, now));
+            act(_input.pageKey(key, _view.getPage(), now));
         } else if (check == BACK_WAIT) {
             _backAt = now;
-            _view.deferBack(now + BackGuard.WAIT_MS, method(:backDue));
+            _view.deferBack(now + _back.wait, method(:backDue));
         }
         return true;
     }
 
-    // A quick BACK, BackGuard.WAIT_MS later: the undo, unless the screen was touched meanwhile.
+    // A quick BACK, the guard's wait later: the undo, unless the screen was touched meanwhile.
     function backDue() as Void {
         var undo = _back.untouchedSince(_backAt);
         InputLog.add("back", null, null, undo ? "undo" : "dropped");
         if (undo) {
-            act(_input.key(WatchUi.KEY_ESC, System.getTimer()));
+            act(_input.pageKey(WatchUi.KEY_ESC, _view.getPage(), System.getTimer()));
         }
     }
 
@@ -85,22 +90,28 @@ class ScoreDelegate extends WatchUi.InputDelegate {
     function onTap(clickEvent as WatchUi.ClickEvent) as Boolean {
         var now = System.getTimer();
         var y = (clickEvent.getCoordinates() as Array<Number>)[1];
-        _input.touchScoring = Settings.isTouchScoring();
-        _input.debounce = Settings.getDebounce();
+        readTouchSettings();
         var action = _input.tap(y, System.getDeviceSettings().screenHeight, _view.getPage(), now);
-        InputLog.add("tap", y, null, action == INPUT_POINT ? (_input.team == TEAM_US ? "US" : "THEM") : null);
+        InputLog.add("tap", y, null, pointText(action));
         act(action);
         return true;
     }
 
+    // A point press with touch scoring by hold, on the score page (ScoreInput.hold()); else a touch.
     function onHold(clickEvent as WatchUi.ClickEvent) as Boolean {
-        InputLog.add("hold", null, null, null);
-        return touch();
+        var now = System.getTimer();
+        var y = (clickEvent.getCoordinates() as Array<Number>)[1];
+        readTouchSettings();
+        var action = _input.hold(y, System.getDeviceSettings().screenHeight, _view.getPage(), now);
+        InputLog.add("hold", y, null, pointText(action));
+        act(action);
+        return true;
     }
 
     function onRelease(clickEvent as WatchUi.ClickEvent) as Boolean {
         InputLog.add("up", null, null, null);
-        return touch();
+        act(_input.release(System.getTimer()));
+        return true;
     }
 
     function onDrag(dragEvent as WatchUi.DragEvent) as Boolean {
@@ -116,6 +127,18 @@ class ScoreDelegate extends WatchUi.InputDelegate {
     private function touch() as Boolean {
         act(_input.touch(System.getTimer()));
         return true;
+    }
+
+    // Touch scoring, its gesture and the press delay as stored, read at each touch.
+    private function readTouchSettings() as Void {
+        _input.touchScoring = Settings.isTouchScoring();
+        _input.touchGesture = Settings.getTouchGesture();
+        _input.debounce = Settings.getDebounce();
+    }
+
+    // The input log's note of a touch: the team it scored for.
+    private function pointText(action as ScoreAction) as String? {
+        return action == INPUT_POINT ? (_input.team == TEAM_US ? "US" : "THEM") : null;
     }
 
     private function act(action as ScoreAction) as Void {

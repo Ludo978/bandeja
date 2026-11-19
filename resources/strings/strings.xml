@@ -70,6 +70,12 @@
     <string id="SoundsOn">Important events</string>
     <string id="MenuChangeOfEnds">Change of ends alert</string>
     <string id="MenuTouchScoring">Touch scoring</string>
+    <!-- Touch scoring on the watches without UP and DOWN, always on: the gesture that scores, under the
+         item and in its list. In the Garmin Connect app, the list's title names those watches (every
+         watch lists it, and the others never read it). -->
+    <string id="GestureTap">Tap</string>
+    <string id="GestureHold">Hold</string>
+    <string id="SettingTouchGesture">Touch gesture (Venu, vivoactive, Approach, D2 Air)</string>
     <!-- The Press delay setting: the debounce, in seconds. -->
     <string id="MenuDebounce">Press delay</string>
     <string id="Debounce500">0.5 s</string>

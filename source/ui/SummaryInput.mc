@@ -20,11 +20,14 @@ enum SummaryAction {
 // as it is: running after a match point, paused after the pause menu's End match or End set now, as
 // it was when they were picked; START resumes on the score screen. UP and DOWN never score
 // here: they turn the pages, as swipes down and up do. Hold UP opens the menu; touches and other
-// swipes do nothing. Nothing leaves the summary but Save, Discard and BACK.
+// swipes do nothing. Nothing leaves the summary but Save, Discard and BACK. On the watches without UP
+// and DOWN (InputFlags), a swipe up on the last page opens the menu (swipeMenu).
 class SummaryInput {
 
     // The page showing, from 0.
     var page as Number = 0;
+    // A swipe up on the last page opens the menu (InputFlags).
+    var swipeMenu as Boolean = false;
     // The event the last SUMMARY_UNDO took back.
     var undone as MatchEvent? = null;
 
@@ -54,10 +57,11 @@ class SummaryInput {
         return SUMMARY_NONE;
     }
 
-    // A swipe up shows the page below, a swipe down the one above.
+    // A swipe up shows the page below, a swipe down the one above. With swipeMenu, a swipe up on the
+    // last page opens the menu.
     function swipe(direction as WatchUi.SwipeDirection) as SummaryAction {
         if (direction == WatchUi.SWIPE_UP) {
-            return turn(1);
+            return swipeMenu && page == _pages - 1 ? SUMMARY_MENU : turn(1);
         } else if (direction == WatchUi.SWIPE_DOWN) {
             return turn(-1);
         }

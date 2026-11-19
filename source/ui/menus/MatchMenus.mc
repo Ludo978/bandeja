@@ -9,8 +9,9 @@ import Toybox.WatchUi;
 //
 // An item that sets a value stays in its menu and shows the new value under its label, as in the
 // Settings menu: Swap our server order (our next server, Me / Partner), Fix serving team (Us / Them),
-// Deuce mode (the four modes, opening on the current one), Vibration, Sounds and Touch scoring. The
-// other items leave it: Resume, End match, End set now, Data page and Stats page close it, Save and
+// Deuce mode (the four modes, opening on the current one), Vibration, Sounds and Touch scoring (a
+// toggle, or on the watches without UP and DOWN its gesture, Tap / Hold, a list). The other items leave
+// it: Resume, End match, End set now, Data page and Stats page close it, Save and
 // Discard end the app, Settings opens its menu above it, and so does Edit score (EditScoreMenu), whose
 // Apply closes both.
 // The score screen shows the events once the menu closes, and BACK there undoes the last one with its
@@ -42,6 +43,9 @@ module MatchMenus {
             } else if (item == ITEM_SOUNDS) {
                 menu.addItem(SettingsMenu.soundsItem(item));
                 settings[item] = :sounds;
+            } else if (item == ITEM_TOUCH_SCORING && rules.gestureItem) {
+                menu.addItem(SettingsMenu.touchGestureItem(item));
+                settings[item] = :touchGesture;
             } else if (item == ITEM_TOUCH_SCORING) {
                 menu.addItem(SettingsMenu.touchScoringItem(item));
                 settings[item] = :touchScoring;
@@ -181,6 +185,8 @@ class MatchMenuDelegate extends WatchUi.Menu2InputDelegate {
             SettingsMenu.pushVibration(_menu, ITEM_VIBRATION);
         } else if (id == ITEM_SOUNDS) {
             Settings.setSounds((item as WatchUi.ToggleMenuItem).isEnabled());
+        } else if (id == ITEM_TOUCH_SCORING && _rules.gestureItem) {
+            SettingsMenu.pushTouchGesture(_menu, ITEM_TOUCH_SCORING);
         } else if (id == ITEM_TOUCH_SCORING) {
             Settings.setTouchScoring((item as WatchUi.ToggleMenuItem).isEnabled());
         }

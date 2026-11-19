@@ -28,6 +28,14 @@
     <setting propertyKey="@Properties.touchScoring" title="@Strings.MenuTouchScoring">
         <settingConfig type="boolean" />
     </setting>
+    <!-- TouchGesture: the watches without UP and DOWN read it in place of the switch above, the others
+         the switch only -->
+    <setting propertyKey="@Properties.touchGesture" title="@Strings.SettingTouchGesture">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.GestureTap</listEntry>
+            <listEntry value="1">@Strings.GestureHold</listEntry>
+        </settingConfig>
+    </setting>
     <!-- The press delay in milliseconds (Settings.debounceChoices()) -->
     <setting propertyKey="@Properties.debounce" title="@Strings.MenuDebounce">
         <settingConfig type="list">

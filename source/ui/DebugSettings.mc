@@ -17,14 +17,15 @@ module DebugSettings {
 
     const DELAY = 10000;
     // Each: its name, then serve tracking, warm-up, vibration, sounds, change of ends alert, touch scoring,
-    // press delay, theme, our team's name, theirs.
+    // its gesture (the watches without UP and DOWN), press delay, theme, our team's name, theirs.
     const PRESETS = [
-        ["Grass, names", false, false, 2, true, false, true, 1200, 2, "Hugo & Lena", "Las Panteras"],
-        ["Clay, long names", true, true, 1, false, true, false, 500, 1, "Łukasz & Zoë", "MMMMMMMMMMMMMMM"],
-        ["Defaults", true, true, 0, false, true, false, 800, 0, "", ""]
+        ["Grass, names", false, false, 2, true, false, true, 1, 1200, 2, "Hugo & Lena", "Las Panteras"],
+        ["Clay, long names", true, true, 1, false, true, false, 0, 500, 1, "Łukasz & Zoë", "MMMMMMMMMMMMMMM"],
+        ["Defaults", true, true, 0, false, true, false, 0, 800, 0, "", ""]
     ];
     const KEYS = [Settings.SERVE_TRACKING, Settings.WARM_UP, Settings.VIBRATION, Settings.SOUNDS, Settings.CHANGE_OF_ENDS,
-        Settings.TOUCH_SCORING, Settings.DEBOUNCE, Settings.THEME, Settings.TEAM_NAME_US, Settings.TEAM_NAME_THEM];
+        Settings.TOUCH_SCORING, Settings.TOUCH_GESTURE, Settings.DEBOUNCE, Settings.THEME, Settings.TEAM_NAME_US,
+        Settings.TEAM_NAME_THEM];
 
     var _next as Number = 0;
     var _change as DebugSettingsChange? = null;

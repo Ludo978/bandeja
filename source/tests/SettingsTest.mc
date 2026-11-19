@@ -171,6 +171,34 @@ function settingsRoundTripTest(logger as Logger) as Boolean {
 }
 
 (:test)
+function settingsTouchGestureTest(logger as Logger) as Boolean {
+    // The Touch scoring setting's gesture on the watches without UP and DOWN: Tap (0, the default) or Hold
+    // (1), stored as a Number and never renumbered, declared in properties.xml. A value missing, of another
+    // type or out of range reads as Tap. The watches with UP and DOWN store it too (one settings.xml for
+    // every watch) and never read it.
+    Test.assert(Settings.TOUCH_GESTURE.equals("touchGesture") && Settings.DEFAULT_TOUCH_GESTURE == GESTURE_TAP);
+    Test.assert((GESTURE_TAP as Number) == 0 && (GESTURE_HOLD as Number) == 1);
+    Test.assert(Settings.readTouchGesture(0) == GESTURE_TAP && Settings.readTouchGesture(1) == GESTURE_HOLD);
+    var bad = [null, -1, 2, "1", 1.0, 1l, true];
+    for (var i = 0; i < bad.size(); i++) {
+        Test.assertEqualMessage(Settings.readTouchGesture(bad[i]), GESTURE_TAP, "bad gesture " + i);
+    }
+    var saved = Settings.read(Settings.TOUCH_GESTURE);
+    Test.assert(saved instanceof Number);
+    try {
+        Settings.setTouchGesture(GESTURE_HOLD);
+        Test.assertEqual(Settings.getTouchGesture(), GESTURE_HOLD);
+        Settings.setTouchGesture(GESTURE_TAP);
+        Test.assertEqual(Settings.getTouchGesture(), GESTURE_TAP);
+        Settings.write(Settings.TOUCH_GESTURE, 7);
+        Test.assertEqual(Settings.getTouchGesture(), GESTURE_TAP);
+    } finally {
+        Settings.write(Settings.TOUCH_GESTURE, saved as Number);
+    }
+    return true;
+}
+
+(:test)
 function formatStoreTest(logger as Logger) as Boolean {
     // The last format picked comes back as it was. First launch, or data that can't be used: Best of 3,
     // Star point, doubles, not mixed. The last Custom structure is kept apart from the format, so

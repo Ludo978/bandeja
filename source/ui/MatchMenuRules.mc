@@ -35,9 +35,17 @@ enum MatchMenuItem {
 // A timed match whose court time is up (CourtBooking.offersFinish()) offers Finish and Keep playing at
 // the top of the pause menu, in place of Resume and End match: Finish ends the match
 // early as End match does, Keep playing resumes and ends the TIME alert. Never a prompt during play.
+//
+// The watches without UP and DOWN (InputFlags) open the match menu with a swipe up, which a stray touch
+// can do: there its items that log nothing come first, those that log an event last (eventsLast), so a
+// tap right after a stray swipe up changes nothing; Touch scoring shows its gesture under it, Tap or Hold
+// (gestureItem). Where the watch plays no tones, Sounds is left out (noSounds).
 class MatchMenuRules {
 
     var match as CurrentMatch;
+    var eventsLast as Boolean = false;
+    var gestureItem as Boolean = false;
+    var noSounds as Boolean = false;
     private var _session as SessionManager;
 
     function initialize(match as CurrentMatch, session as SessionManager) {
@@ -75,9 +83,28 @@ class MatchMenuRules {
     // Data page / Stats page / Swap our server order / Fix serving team / Deuce mode / Edit score /
     // Vibration / Sounds / Touch scoring; Data page / Stats page / Vibration / Sounds / Touch scoring once
     // the match is over (the pages and the settings log nothing). Edit score is in this menu only, not
-    // the pause menu. Touch scoring only on a watch with a touchscreen (Settings.hasTouchScreen()).
+    // the pause menu. Touch scoring only on a watch with a touchscreen (Settings.hasTouchScreen()). With
+    // eventsLast, the items that log an event after the settings.
     function getMatchItems() as Array<MatchMenuItem> {
         var items = [ITEM_DATA_PAGE, ITEM_STATS_PAGE] as Array<MatchMenuItem>;
+        if (!eventsLast) {
+            addEvents(items);
+        }
+        items.add(ITEM_VIBRATION);
+        if (!noSounds) {
+            items.add(ITEM_SOUNDS);
+        }
+        if (Settings.hasTouchScreen()) {
+            items.add(ITEM_TOUCH_SCORING);
+        }
+        if (eventsLast) {
+            addEvents(items);
+        }
+        return items;
+    }
+
+    // The match menu's items that log an event: the corrections, then Edit score.
+    private function addEvents(items as Array<MatchMenuItem>) as Void {
         if (!isMatchOver() && !match.engine.isFull()) {
             addCorrections(items);
         }
@@ -87,12 +114,6 @@ class MatchMenuRules {
         if (!isMatchOver() && sets <= ScoreEdit.MAX && EditScoreRules.fits(match.engine, sets)) {
             items.add(ITEM_EDIT_SCORE);
         }
-        items.add(ITEM_VIBRATION);
-        items.add(ITEM_SOUNDS);
-        if (Settings.hasTouchScreen()) {
-            items.add(ITEM_TOUCH_SCORING);
-        }
-        return items;
     }
 
     function getLabel(item as MatchMenuItem) as ResourceId {
@@ -105,8 +126,8 @@ class MatchMenuRules {
 
     // The value under an item that sets one: our player for our current or next service game (Swap
     // our server order), the team serving now (Fix serving team, none while unknown), the deuce mode
-    // chosen for the next games (Deuce mode). Null for the others; Vibration's is a setting, and
-    // Sounds and Touch scoring are toggles.
+    // chosen for the next games (Deuce mode); with gestureItem, the gesture that scores (Touch scoring).
+    // Null for the others; Vibration's is a setting, and Sounds and Touch scoring are toggles.
     function getValue(item as MatchMenuItem) as ResourceId? {
         var state = match.getState();
         if (item == ITEM_SWAP_SERVER) {
@@ -116,8 +137,15 @@ class MatchMenuRules {
             return team != null ? teamName(team) : null;
         } else if (item == ITEM_DEUCE_MODE) {
             return FormatText.deuceModeName(state.deuceMode);
+        } else if (item == ITEM_TOUCH_SCORING && gestureItem) {
+            return gestureName(Settings.getTouchGesture());
         }
         return null;
+    }
+
+    // Tap or Hold, as the menus show the Touch scoring setting's gesture.
+    static function gestureName(gesture as TouchGesture) as ResourceId {
+        return gesture == GESTURE_HOLD ? Rez.Strings.GestureHold : Rez.Strings.GestureTap;
     }
 
     // Us or Them, as the menus' lists show the teams.

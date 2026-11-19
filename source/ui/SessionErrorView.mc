@@ -108,6 +108,15 @@ class SessionErrorDelegate extends WatchUi.BehaviorDelegate {
         System.exit();
     }
 
+    // START as a key, on a watch whose START gives no select behavior (the D2 Air X10): the behaviors come
+    // first, so elsewhere onSelect() has already exited.
+    function onKey(keyEvent as WatchUi.KeyEvent) as Boolean {
+        if (keyEvent.getKey() == WatchUi.KEY_ENTER) {
+            System.exit();
+        }
+        return false;
+    }
+
     function onBack() as Boolean {
         System.exit();
     }

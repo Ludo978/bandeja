@@ -184,6 +184,27 @@ function summaryPagesTest(logger as Logger) as Boolean {
 }
 
 (:test)
+function summaryMenuSwipeTest(logger as Logger) as Boolean {
+    // On the watches without UP and DOWN (the flag on), a swipe up on the last page opens the summary's
+    // menu; on the pages before it, it turns to the next one, as without the flag. Off, a swipe up on the
+    // last page does nothing (summaryPagesTest). Nothing ever scores.
+    var test = new SummaryTests.Summary(new MatchConfig(), "UUUUUU UUUUUT uuuu");
+    var input = test.input;
+    var events = test.rig.getState().eventCount;
+    input.swipeMenu = true;
+    Test.assert(input.swipe(WatchUi.SWIPE_UP) == SUMMARY_PAGE && input.page == 1);
+    Test.assert(input.swipe(WatchUi.SWIPE_UP) == SUMMARY_PAGE && input.page == 2);
+    Test.assert(input.swipe(WatchUi.SWIPE_UP) == SUMMARY_MENU && input.page == 2);
+    Test.assert(input.swipe(WatchUi.SWIPE_DOWN) == SUMMARY_PAGE && input.page == 1);
+    Test.assert(input.swipe(WatchUi.SWIPE_LEFT) == SUMMARY_NONE && input.swipe(WatchUi.SWIPE_RIGHT) == SUMMARY_NONE);
+    Test.assert(input.key(WatchUi.KEY_MENU) == SUMMARY_MENU && input.page == 1);
+    input.swipeMenu = false;
+    Test.assert(input.swipe(WatchUi.SWIPE_UP) == SUMMARY_PAGE && input.swipe(WatchUi.SWIPE_UP) == SUMMARY_NONE && input.page == 2);
+    Test.assert(test.rig.getState().eventCount == events && test.rig.getState().matchOver);
+    return true;
+}
+
+(:test)
 function summaryUndoTest(logger as Logger) as Boolean {
     // BACK after the match point (the session running): the point undone, the match exactly as it was
     // before it, the session still running. Back on the score screen, play goes on: the next

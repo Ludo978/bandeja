@@ -23,6 +23,7 @@ class SummaryDelegate extends WatchUi.InputDelegate {
         _view = view;
         _input = input;
         _match = match;
+        InputFlags.setBack(_back, InputFlags.touchOnly());
     }
 
     function onKeyPressed(keyEvent as WatchUi.KeyEvent) as Boolean {
@@ -31,7 +32,7 @@ class SummaryDelegate extends WatchUi.InputDelegate {
     }
 
     // The edge swipe's fake BACK does nothing (BackGuard): only the BACK button undoes. A quick BACK
-    // waits BackGuard.WAIT_MS for the swipe's drags (backDue()).
+    // waits the guard's wait for the swipe's drags (backDue()).
     function onKey(keyEvent as WatchUi.KeyEvent) as Boolean {
         var now = System.getTimer();
         var check = _back.check(keyEvent.getKey(), now);
@@ -42,7 +43,7 @@ class SummaryDelegate extends WatchUi.InputDelegate {
             if (_backTimer == null) {
                 _backTimer = new Timer.Timer();
             }
-            (_backTimer as Timer.Timer).start(method(:backDue), BackGuard.WAIT_MS, false);
+            (_backTimer as Timer.Timer).start(method(:backDue), _back.wait, false);
         }
         return true;
     }

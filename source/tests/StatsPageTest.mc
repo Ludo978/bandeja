@@ -147,6 +147,31 @@ function statsPageSwipeTest(logger as Logger) as Boolean {
 }
 
 (:test)
+function statsPageWrapTest(logger as Logger) as Boolean {
+    // On the watches without UP and DOWN (the flag on), a swipe left on the stats page turns to the score
+    // page, the pages going round; off, it does nothing (statsPageSwipeTest). At the match end, back on the
+    // score page that way, the summary takes over, as after a swipe right.
+    var rig = ScoreMotionTests.screen(new MatchConfig(), "");
+    var motion = rig.motion;
+    motion.wrap = true;
+    Test.assert(rig.swipe(WatchUi.SWIPE_LEFT, 1000) == INPUT_NEXT_PAGE && rig.swipe(WatchUi.SWIPE_LEFT, 1100) == INPUT_NEXT_PAGE);
+    Test.assert(motion.page == PAGE_STATS && !motion.isIdle(INPUT_NEXT_PAGE));
+    Test.assert(rig.swipe(WatchUi.SWIPE_LEFT, 1200) == INPUT_NEXT_PAGE && motion.page == PAGE_SCORE);
+    Test.assert(rig.swipe(WatchUi.SWIPE_LEFT, 1300) == INPUT_NEXT_PAGE && motion.page == PAGE_DATA);
+    Test.assert(rig.swipe(WatchUi.SWIPE_RIGHT, 1400) == INPUT_PREVIOUS_PAGE && motion.page == PAGE_SCORE);
+    Test.assert(motion.isIdle(INPUT_PREVIOUS_PAGE) && rig.getState().eventCount == 0);
+    rig = ScoreMotionTests.screen(new MatchConfig(), ScoreMotionTests.MATCH_POINT);
+    motion = rig.motion;
+    motion.wrap = true;
+    Test.assert(rig.press(WatchUi.KEY_DOWN, 1000) == INPUT_POINT && rig.press(WatchUi.KEY_MENU, 1200) == INPUT_MATCH_MENU);
+    Test.assert(motion.showPage(PAGE_STATS));
+    motion.shown(rig.getState(), 3000);
+    Test.assert(!motion.takeSummary(9000) && rig.swipe(WatchUi.SWIPE_LEFT, 9000) == INPUT_NEXT_PAGE);
+    Test.assert(motion.page == PAGE_SCORE && motion.takeSummary(9000));
+    return true;
+}
+
+(:test)
 function statsPageMenuItemTest(logger as Logger) as Boolean {
     // The match menu's Stats page (after Data page, 2026-11-13) shows the stats page from the score page
     // and from the data page, nothing on it; Data page brings the data page back from it. The page so

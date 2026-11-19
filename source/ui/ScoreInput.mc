@@ -11,7 +11,8 @@ enum ScoreAction {
     INPUT_RESUME,      // START while paused: the session runs again
     INPUT_MATCH_MENU,  // hold UP: the match menu, nothing scored
     INPUT_NEXT_PAGE,     // swipe left: the next page, the data page then the stats page (nothing on the last)
-    INPUT_PREVIOUS_PAGE  // swipe right: the page before, back to the score page (nothing on the score page)
+    INPUT_PREVIOUS_PAGE, // swipe right: the page before, back to the score page (nothing on the score page)
+    INPUT_SCORE_PAGE     // BACK on the data or the stats page (ScoreInput.pageBack): the score page, nothing undone
 }
 
 // What a point won, for the feedback and the overlay.
@@ -42,6 +43,14 @@ enum PointWon {
 // never score, nor taps on the data page and the stats page. Every touch goes through the BACK guard
 // (back), which the delegate's BACK keys go through too: a tap that scored doesn't hold BACK back, so
 // BACK right after it undoes it, and a tap at the end of the watch's edge swipe never scores.
+//
+// The watches without UP and DOWN (InputFlags) set three flags. touchAlways: touch scoring is always on,
+// the Touch scoring setting doesn't apply, and its gesture does (touchGesture): by tap as above, or by
+// hold, where the watch's touch hold on a half of the score page is the point press and a tap does
+// nothing. One hold, one point: hold events after a hold that scored do nothing until its finger lifts
+// (release()) or BackGuard.HOLD_MS has passed, or an undo. pageBack: BACK on the data and stats pages
+// brings the score page back and undoes nothing (pageKey()), any BACK key, the BACK guard not asked
+// (keyCheck()). swipeMenu: a swipe up opens the match menu, from any page, as hold UP does.
 class ScoreInput {
 
     // The last action's details: the team, what it won, whether it wrote its game's lap, which
@@ -57,6 +66,13 @@ class ScoreInput {
     var toast as ResourceId? = null;
     // The Touch scoring setting, which the delegate reads at each tap.
     var touchScoring as Boolean = Settings.DEFAULT_TOUCH_SCORING;
+    // The watches without UP and DOWN: touch scoring always on, by touchGesture (the setting's gesture,
+    // which the delegate reads at each touch); then BACK on the data and stats pages (pageBack), and a
+    // swipe up for the match menu (swipeMenu). InputFlags sets them.
+    var touchAlways as Boolean = false;
+    var touchGesture as TouchGesture = Settings.DEFAULT_TOUCH_GESTURE;
+    var pageBack as Boolean = false;
+    var swipeMenu as Boolean = false;
     // The Press delay setting, in System.getTimer() milliseconds, which the delegate
     // reads at each key and each tap: a press is held to the value it comes with.
     var debounce as Number = Settings.DEFAULT_DEBOUNCE;
@@ -68,10 +84,32 @@ class ScoreInput {
     private var _session as SessionManager;
     // System.getTimer() at the last point that counted; null before the first and after an undo.
     private var _lastPoint as Number? = null;
+    // The last hold that scored, until its finger lifts (release()) or an undo: holds within
+    // BackGuard.HOLD_MS of it are its own.
+    private var _holdAt as Number? = null;
 
     function initialize(match as CurrentMatch, session as SessionManager) {
         _match = match;
         _session = session;
+    }
+
+    // What the BACK guard makes of a key on the page showing, which the delegate asks before pageKey().
+    // With pageBack, a BACK key on the data page or the stats page acts at once whatever the guard says:
+    // it undoes nothing there, so a watch that sends a swipe right as a BACK key still goes back. The
+    // guard sees the key all the same (a quick one is the edge swipe's for the taps after it).
+    function keyCheck(button as WatchUi.Key, page as ScorePage, now as Number) as BackCheck {
+        var check = back.check(button, now);
+        return pageBack && button == WatchUi.KEY_ESC && page != PAGE_SCORE ? BACK_NOW : check;
+    }
+
+    // A button on the page showing: with pageBack, BACK on the data page or the stats page brings the
+    // score page back, nothing undone; else key().
+    function pageKey(button as WatchUi.Key, page as ScorePage, now as Number) as ScoreAction {
+        if (pageBack && button == WatchUi.KEY_ESC && page != PAGE_SCORE) {
+            clear();
+            return INPUT_SCORE_PAGE;
+        }
+        return key(button, now);
     }
 
     // A button, as onKey gets it; now is System.getTimer().
@@ -91,20 +129,57 @@ class ScoreInput {
         return INPUT_NONE;
     }
 
+    // A swipe left or right turns the pages; up, with swipeMenu, opens the match menu.
     function swipe(direction as WatchUi.SwipeDirection, now as Number) as ScoreAction {
         clear();
         back.touched(now);
         if (direction == WatchUi.SWIPE_LEFT) {
             return INPUT_NEXT_PAGE;
+        } else if (direction == WatchUi.SWIPE_RIGHT) {
+            return INPUT_PREVIOUS_PAGE;
         }
-        return direction == WatchUi.SWIPE_RIGHT ? INPUT_PREVIOUS_PAGE : INPUT_NONE;
+        return swipeMenu && direction == WatchUi.SWIPE_UP ? INPUT_MATCH_MENU : INPUT_NONE;
     }
 
-    // A touch hold or its release, a drag, a flick: never a point.
+    // A drag, a flick, a hold or a release that scores nothing: never a point.
     function touch(now as Number) as ScoreAction {
         clear();
         back.touched(now);
         return INPUT_NONE;
+    }
+
+    // A touch's release: the finger lifted, so the next hold is a new one. The release of a hold that
+    // scored is that hold's last touch, which doesn't start the BACK guard's wait; any other is a touch.
+    function release(now as Number) as ScoreAction {
+        if (_holdAt == null) {
+            return touch(now);
+        }
+        _holdAt = null;
+        clear();
+        back.holdReleased(now);
+        return INPUT_NONE;
+    }
+
+    // A touch hold (onHold) y pixels from the top of a screen height high, on the page showing. With
+    // touch scoring by hold (touchAlways, GESTURE_HOLD), on the score page, a point press for the half
+    // held as tap() has it, once: a hold within BackGuard.HOLD_MS of one that scored, its finger not
+    // lifted since, is its own. A hold that scored doesn't start the BACK guard's wait. Otherwise, and
+    // during the watch's edge swipe, a touch.
+    function hold(y as Number, height as Number, page as ScorePage, now as Number) as ScoreAction {
+        var holdAt = _holdAt;
+        if (!scores(GESTURE_HOLD) || page != PAGE_SCORE || back.isEdgeSwipe(now)
+                || (holdAt != null && now - holdAt >= 0 && now - holdAt < BackGuard.HOLD_MS)) {
+            return touch(now);
+        }
+        clear();
+        var action = point(y * 2 < height ? TEAM_THEM : TEAM_US, now);
+        if (action == INPUT_POINT) {
+            _holdAt = now;
+            back.holdScored(now);
+        } else {
+            back.touched(now);
+        }
+        return action;
     }
 
     // A tap (onTap: a touch neither held nor moved more than a few pixels, never a swipe, a drag or a
@@ -113,7 +188,7 @@ class ScoreInput {
     // doesn't start the BACK guard's wait when it scored. Otherwise, and at the end of the watch's
     // edge swipe, a touch like any other.
     function tap(y as Number, height as Number, page as ScorePage, now as Number) as ScoreAction {
-        if (!touchScoring || page != PAGE_SCORE || back.isEdgeSwipe(now)) {
+        if (!scores(GESTURE_TAP) || page != PAGE_SCORE || back.isEdgeSwipe(now)) {
             return touch(now);
         }
         clear();
@@ -124,6 +199,12 @@ class ScoreInput {
             back.touched(now);
         }
         return action;
+    }
+
+    // Whether gesture scores: by tap with touch scoring on; on the watches without UP and DOWN
+    // (touchAlways) the setting's gesture, tap or hold.
+    private function scores(gesture as TouchGesture) as Boolean {
+        return touchAlways ? touchGesture == gesture : touchScoring && gesture == GESTURE_TAP;
     }
 
     // The "Undone" toast's string for an event type.
@@ -191,6 +272,7 @@ class ScoreInput {
             return showToast(Rez.Strings.UndoneNothing);
         }
         _lastPoint = null;
+        _holdAt = null;
         undone = event;
         toast = undoneString(event.type);
         return INPUT_UNDO;

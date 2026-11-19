@@ -16,6 +16,13 @@ enum ThemeSetting {
     THEME_GRASS = 2   // green / violet
 }
 
+// The Touch scoring setting on the watches without UP and DOWN (Settings.hasScoreButtons() false), where
+// touch scoring is always on: the gesture that scores. The values are stored: never renumber.
+enum TouchGesture {
+    GESTURE_TAP = 0,  // a tap on a half, as touch scoring on the other watches
+    GESTURE_HOLD = 1  // the watch's touch hold on a half; a tap does nothing
+}
+
 // The settings, and Indoor / Outdoor and the timed match (picked in the Format menu), kept in
 // Application.Properties as declared in resources/settings/properties.xml. They are read when
 // needed, not cached, so a change in a menu applies at once. A value that is missing, of another
@@ -35,6 +42,7 @@ module Settings {
     const TIMED_MATCH = "timedMatch";
     const CHANGE_OF_ENDS = "changeOfEnds";
     const TOUCH_SCORING = "touchScoring";
+    const TOUCH_GESTURE = "touchGesture";
     const THEME = "theme";
     const DEBOUNCE = "debounce";
     const TEAM_NAME_US = "teamNameUs";
@@ -49,6 +57,7 @@ module Settings {
     const DEFAULT_TIMED_MATCH = false;
     const DEFAULT_CHANGE_OF_ENDS = true;
     const DEFAULT_TOUCH_SCORING = false;
+    const DEFAULT_TOUCH_GESTURE = GESTURE_TAP;
     const DEFAULT_THEME = THEME_COURT;
     // Milliseconds, as stored.
     const DEFAULT_DEBOUNCE = 800;
@@ -135,6 +144,16 @@ module Settings {
         write(TOUCH_SCORING, on);
     }
 
+    // The gesture that scores on the watches without UP and DOWN, where touch scoring is always on (the
+    // Touch scoring setting above doesn't apply there). Stored on every watch, read on those only.
+    function getTouchGesture() as TouchGesture {
+        return readTouchGesture(read(TOUCH_GESTURE));
+    }
+
+    function setTouchGesture(gesture as TouchGesture) as Void {
+        write(TOUCH_GESTURE, gesture as Number);
+    }
+
     // Whether the watch has a touchscreen, which Touch scoring needs: the menus leave it out on
     // the watches without one (the Instinct 3 AMOLED and Instinct Crossover AMOLED). Known per watch
     // when it's built, monkey.jungle excluding one of the two below, rather than from
@@ -147,6 +166,20 @@ module Settings {
 
     (:noTouchScreen)
     function hasTouchScreen() as Boolean {
+        return false;
+    }
+
+    // Whether the watch gives the app UP and DOWN to score with, and hold UP for the menu. The Venu,
+    // vivoactive 5 and 6, D2 Air X10 and Approach S50, S70 and S72 give it START, BACK and touch only:
+    // there touch scoring is always on and the swipes take the menus (InputFlags). Known per watch when
+    // it's built, monkey.jungle excluding one of the two below.
+    (:scoreButtons)
+    function hasScoreButtons() as Boolean {
+        return true;
+    }
+
+    (:noScoreButtons)
+    function hasScoreButtons() as Boolean {
         return false;
     }
 
@@ -243,6 +276,14 @@ module Settings {
             return value as VibrationSetting;
         }
         return DEFAULT_VIBRATION;
+    }
+
+    // A stored value, if it's a TouchGesture.
+    function readTouchGesture(value as Object?) as TouchGesture {
+        if (value instanceof Number && value >= GESTURE_TAP && value <= GESTURE_HOLD) {
+            return value as TouchGesture;
+        }
+        return DEFAULT_TOUCH_GESTURE;
     }
 
     // A stored value, if it's a ThemeSetting.

@@ -40,15 +40,20 @@ function layoutTextWidthTest(logger as Logger) as Boolean {
     // In mockup pixels, with the font the screen gets, the width doesn't depend on the screen. The
     // mockups' widths from Roboto Condensed Bold's advances: "30" at 120 is 121.4, "BREAK POINT" at 16
     // is 89.4 plus 10 letter spacings of 2. No spacing after the last character, nor for one character.
-    // The smaller screen is the FR265S's 360 px, or this watch's own where its fonts are bundled
-    // (BundledFonts: sized for the screens that bundle them, 390 and 416 px).
+    // On the FR265's 416 px and the FR265S's 360 px; where the fonts are bundled, on this watch's own
+    // screen twice (BundledFonts holds the sizes of its screen size only: 360, 390 and 416, or 454 px),
+    // the text's width taken at the whole em size the screen draws (at 454 px the 16 is 17.46 px, drawn
+    // at 17: 3 % narrower).
     var dc = (Graphics.createBufferedBitmap({:width => 4, :height => 4}).get() as Graphics.BufferedBitmap).getDc();
-    var l416 = new Layout(416);
-    var small = new Layout(Fonts.isVector() ? 360 : System.getDeviceSettings().screenWidth);
-    TestKit.assertNear(l416.textWidth(dc, STYLE_NUMBER, 120, "30", 0), 121.4, 2);
-    TestKit.assertNear(small.textWidth(dc, STYLE_NUMBER, 120, "30", 0), 121.4, 3);
-    TestKit.assertNear(l416.textWidth(dc, STYLE_BOLD, 16, "BREAK POINT", 2), 109.4, 2);
-    TestKit.assertNear(small.textWidth(dc, STYLE_BOLD, 16, "BREAK POINT", 2), 109.4, 3);
+    var own = System.getDeviceSettings().screenWidth;
+    var l416 = new Layout(Fonts.isVector() ? 416 : own);
+    var small = new Layout(Fonts.isVector() ? 360 : own);
+    var digits = Fonts.isVector() ? 121.4 : 121.4 * l416.fontSize(120) / (120 * l416.scale);
+    var label = Fonts.isVector() ? 109.4 : 89.4 * l416.fontSize(16) / (16 * l416.scale) + 20;
+    TestKit.assertNear(l416.textWidth(dc, STYLE_NUMBER, 120, "30", 0), digits, 2);
+    TestKit.assertNear(small.textWidth(dc, STYLE_NUMBER, 120, "30", 0), digits, 3);
+    TestKit.assertNear(l416.textWidth(dc, STYLE_BOLD, 16, "BREAK POINT", 2), label, 2);
+    TestKit.assertNear(small.textWidth(dc, STYLE_BOLD, 16, "BREAK POINT", 2), label, 3);
     Test.assertEqual(l416.textWidth(dc, STYLE_BOLD, 16, "B", 2), l416.textWidth(dc, STYLE_BOLD, 16, "B", 0));
     Test.assertEqual(l416.textWidth(dc, STYLE_BOLD, 16, "", 2), 0.0);
     return true;
@@ -77,8 +82,9 @@ function fontsVectorTest(logger as Logger) as Boolean {
     // their line height (FONT_NUMBER_HOT on the FR265 and FR265S, FONT_NUMBER_MEDIUM on the fenix 9 Pro
     // 51 mm, whose number fonts are larger), the labels the smallest text font, and big text the biggest
     // text font, never a number font.
-    if (!(Graphics has :getVectorFont)) {
-        // The Descent G2 and the Instinct 3 AMOLED: their bundled fonts (fontsBundledTest).
+    if (!Fonts.isVector()) {
+        // The watches built with bundled fonts, the Venu 3 and 3S too, which have the vector API but
+        // not its Roboto Condensed faces (fontsBundledTest).
         return true;
     }
     var l = new Layout(System.getDeviceSettings().screenWidth);
@@ -97,7 +103,10 @@ function fontsVectorTest(logger as Logger) as Boolean {
         var index = Fonts.nearest(Fonts.lineHeight(l.fontSize(120)), heights);
         Test.assert(!Fonts.isVector() && l.font(STYLE_NUMBER, 120) == numbers[index]);
         Test.assert(index >= Fonts.fallbacks(STYLE_BOLD).size());
-        if (l.width == 416 || l.width == 360) {
+        // The FR265's and FR265S's system fonts (their part numbers): other watches of those sizes, the
+        // Approach S72 43 mm, have others.
+        var part = System.getDeviceSettings().partNumber;
+        if (part.equals("006-B4257-00") || part.equals("006-B4258-00")) {
             Test.assertEqual(numbers[index], Graphics.FONT_NUMBER_HOT);
         }
         Test.assert(l.font(STYLE_BOLD, 15) == Graphics.FONT_XTINY && l.font(STYLE_REGULAR, 13) == Graphics.FONT_XTINY);
@@ -110,11 +119,16 @@ function fontsVectorTest(logger as Logger) as Boolean {
 
 (:test :bundledFonts)
 function fontsBundledTest(logger as Logger) as Boolean {
-    // The watches without vector fonts (Descent G2, Instinct 3 AMOLED) draw with the bundled Roboto
-    // Condensed: every mockup size the screens use (and the labels' down to three quarters) gets a
-    // bundled size within a pixel of its em size on this screen, with the vector fonts' line height, and
-    // never a system font. The full character set's French and team name letters have glyphs.
-    Test.assert(!Fonts.isVector());
+    // The watches without Roboto Condensed vector fonts (Descent G2, Instinct 3 AMOLED, Venu 2, 2 Plus, 2S,
+    // 3 and 3S, vivoactive 5, D2 Air X10, Approach S50) draw with the bundled Roboto Condensed of their
+    // screen size, and never ask for a vector font, not even the Venu 3 and 3S, whose vector API has no
+    // such face (getVectorFont gives null there): every mockup size the screens use (and the labels' down
+    // to three quarters) gets a bundled size within a pixel of its em size on this screen, with the vector
+    // fonts' line height, and never a system font. The full character set's French and team name letters
+    // have glyphs, and so do the lower case letters at the mixed-case lines' sizes: the home screen's
+    // format line (bold 21) and its second line (regular 16), the toast (bold 17), the warm-up's format
+    // line (bold 16), and the glance's line at its size in this watch's glance area.
+    Test.assert(!Fonts.isVector() && !BandejaGlance.isVector());
     var l = new Layout(System.getDeviceSettings().screenWidth);
     var dc = (Graphics.createBufferedBitmap({:width => 4, :height => 4}).get() as Graphics.BufferedBitmap).getDc();
     var uses = [[STYLE_BOLD, [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 26, 44, 104, 120]],
@@ -135,6 +149,19 @@ function fontsBundledTest(logger as Logger) as Boolean {
     var letters = "ÀÉÈÊÔÇŁŒÜßéèàçôł·";
     for (var i = 0; i < letters.length(); i++) {
         Test.assertMessage(dc.getTextWidthInPixels(letters.substring(i, i + 1) as String, label) > 0, letters.substring(i, i + 1) as String);
+    }
+    var glanceSize = BandejaGlance.LINE_SIZE * BandejaGlance.scale(GlanceTests.area()[1]);
+    var glanceLine = BandejaGlance.font(glanceSize);
+    var height = Graphics.getFontHeight(glanceLine);
+    Test.assertMessage((height - Fonts.lineHeight(Layout.round(glanceSize))).abs() <= 2, "glance line " + height + " at " + glanceSize);
+    var mixed = [Fonts.get(STYLE_BOLD, l.fontSize(21)), Fonts.get(STYLE_REGULAR, l.fontSize(16)), Fonts.get(STYLE_BOLD, l.fontSize(17)),
+        Fonts.get(STYLE_BOLD, l.fontSize(16)), glanceLine] as Array<Graphics.FontType>;
+    var lower = "abcdefghijklmnopqrstuvwxyzéèàçôœ";
+    for (var f = 0; f < mixed.size(); f++) {
+        for (var i = 0; i < lower.length(); i++) {
+            var letter = lower.substring(i, i + 1) as String;
+            Test.assertMessage(dc.getTextWidthInPixels(letter, mixed[f]) > 0, "font " + f + ": " + letter);
+        }
     }
     return true;
 }

@@ -91,7 +91,9 @@ class ScoreOverlay {
 // page or the stats page after it. A swipe left turns to the next page, a swipe right to the one
 // before; toward no page (left on the stats page, right on the score page) it does nothing. UP, DOWN
 // and BACK answer on the score page, so a point, an undo or a toast brings it back, with its flash,
-// overlay or toast; START and hold UP open their menus over the page showing, which stays.
+// overlay or toast; START and hold UP open their menus over the page showing, which stays. On the
+// watches without UP and DOWN (InputFlags), BACK on the data or stats page brings the score page back
+// (INPUT_SCORE_PAGE), and a swipe left on the stats page goes round to the score page (wrap).
 class ScoreMotion {
 
     static const FLASH = 200;
@@ -108,6 +110,8 @@ class ScoreMotion {
     // The Change of ends alert setting, which the screen reads when it shows: off, a change
     // of ends brings neither the pill nor the toast.
     var endsAlert as Boolean = true;
+    // A swipe left on the stats page turns to the score page (InputFlags).
+    var wrap as Boolean = false;
     // The last input was a point that only won the point and after which the players change ends: the
     // change of ends toast shows from it, for the toast's time.
     var endsToast as Boolean = false;
@@ -123,10 +127,11 @@ class ScoreMotion {
     }
 
     // An input that changes nothing: none, or a page swipe toward no page (swipe left on the stats page,
-    // the last, swipe right on the score page, the first).
+    // the last, unless the pages go round, swipe right on the score page, the first), or the score page
+    // asked for on it.
     function isIdle(action as ScoreAction) as Boolean {
-        return action == INPUT_NONE || (action == INPUT_NEXT_PAGE && page == PAGE_STATS)
-            || (action == INPUT_PREVIOUS_PAGE && page == PAGE_SCORE);
+        return action == INPUT_NONE || (action == INPUT_NEXT_PAGE && page == PAGE_STATS && !wrap)
+            || ((action == INPUT_PREVIOUS_PAGE || action == INPUT_SCORE_PAGE) && page == PAGE_SCORE);
     }
 
     // The match menu's Data page and Stats page: true when target, the data page or the stats page,
@@ -149,10 +154,10 @@ class ScoreMotion {
             return null;
         }
         if (action == INPUT_NEXT_PAGE) {
-            page = page == PAGE_SCORE ? PAGE_DATA : PAGE_STATS;
+            page = page == PAGE_SCORE ? PAGE_DATA : page == PAGE_STATS ? PAGE_SCORE : PAGE_STATS;
         } else if (action == INPUT_PREVIOUS_PAGE) {
             page = page == PAGE_STATS ? PAGE_DATA : PAGE_SCORE;
-        } else if (action == INPUT_POINT || action == INPUT_UNDO || action == INPUT_TOAST) {
+        } else if (action == INPUT_POINT || action == INPUT_UNDO || action == INPUT_TOAST || action == INPUT_SCORE_PAGE) {
             page = PAGE_SCORE;
         }
         var ended = getOverlayAt(now);

@@ -13,6 +13,11 @@ fr170.resourcePath = $(fr170.resourcePath);launcher-icons/54
 fr170m.resourcePath = $(fr170m.resourcePath);launcher-icons/54
 fr57042mm.resourcePath = $(fr57042mm.resourcePath);launcher-icons/54
 fr70.resourcePath = $(fr70.resourcePath);launcher-icons/54
+venu441mm.resourcePath = $(venu441mm.resourcePath);launcher-icons/54
+vivoactive6.resourcePath = $(vivoactive6.resourcePath);launcher-icons/54
+approachs50.resourcePath = $(approachs50.resourcePath);launcher-icons/56
+vivoactive5.resourcePath = $(vivoactive5.resourcePath);launcher-icons/56
+venu2s.resourcePath = $(venu2s.resourcePath);launcher-icons/61
 d2mach2.resourcePath = $(d2mach2.resourcePath);launcher-icons/65
 d2mach2pro.resourcePath = $(d2mach2pro.resourcePath);launcher-icons/65
 fenix847mm.resourcePath = $(fenix847mm.resourcePath);launcher-icons/65
@@ -24,21 +29,70 @@ fr57047mm.resourcePath = $(fr57047mm.resourcePath);launcher-icons/65
 fr965.resourcePath = $(fr965.resourcePath);launcher-icons/65
 fr970.resourcePath = $(fr970.resourcePath);launcher-icons/65
 marq3.resourcePath = $(marq3.resourcePath);launcher-icons/65
+venu445mm.resourcePath = $(venu445mm.resourcePath);launcher-icons/65
+approachs7247mm.resourcePath = $(approachs7247mm.resourcePath);launcher-icons/65
+approachs7047mm.resourcePath = $(approachs7047mm.resourcePath);launcher-icons/70
+d2airx10.resourcePath = $(d2airx10.resourcePath);launcher-icons/70
+venu2.resourcePath = $(venu2.resourcePath);launcher-icons/70
+venu2plus.resourcePath = $(venu2plus.resourcePath);launcher-icons/70
+venu3.resourcePath = $(venu3.resourcePath);launcher-icons/70
+venu3s.resourcePath = $(venu3s.resourcePath);launcher-icons/70
 
-# Code built per watch (excludeAnnotations), each feature as a pair of annotations:
+# Code built per watch (excludeAnnotations), each feature as a pair of annotations. A watch's own line
+# replaces base's, so each line names all four:
 # - Touch scoring needs a touchscreen, which the Instinct 3 AMOLED doesn't have: it builds
 #   Settings.hasTouchScreen()'s (:noTouchScreen) version, every other watch the (:touchScreen) one.
-# - The Descent G2 and the Instinct 3 AMOLED have no vector fonts: they build bundled-fonts/ (Roboto
-#   Condensed as bitmap fonts, scripts/make-fonts.sh) and the (:bundledFonts) code that loads it.
+# - The Descent G2, the Instinct 3 AMOLED, the Venu 2, 2 Plus and 2S, the vivoactive 5, the D2 Air X10
+#   and the Approach S50 have no vector fonts, and the Venu 3 and 3S none in Roboto Condensed: they
+#   build bundled-fonts/ (Roboto Condensed as bitmap fonts, scripts/make-fonts.sh, one folder per
+#   screen size) and the (:bundledFonts) code that loads it, never the vector fonts.
 # - The Instinct 3 AMOLED's glances keep a round window at the right of their strip, which the glance's
 #   line keeps clear of (:glanceWindow).
-base.excludeAnnotations = noTouchScreen;bundledFonts;glanceWindow
-descentg2.excludeAnnotations = noTouchScreen;noBundledFonts;glanceWindow
-instinct3amoled45mm.excludeAnnotations = touchScreen;noBundledFonts;noGlanceWindow
-instinct3amoled50mm.excludeAnnotations = touchScreen;noBundledFonts;noGlanceWindow
-descentg2.sourcePath = $(descentg2.sourcePath);bundled-fonts/source
-instinct3amoled45mm.sourcePath = $(instinct3amoled45mm.sourcePath);bundled-fonts/source
-instinct3amoled50mm.sourcePath = $(instinct3amoled50mm.sourcePath);bundled-fonts/source
-descentg2.resourcePath = $(descentg2.resourcePath);bundled-fonts/resources
-instinct3amoled45mm.resourcePath = $(instinct3amoled45mm.resourcePath);bundled-fonts/resources
-instinct3amoled50mm.resourcePath = $(instinct3amoled50mm.resourcePath);bundled-fonts/resources
+# - The Venu, vivoactive 5 and 6, D2 Air X10 and Approach S50, S70 and S72 give an app START, BACK and
+#   touch only, no UP and DOWN to score with and no hold UP for the menu: they build
+#   Settings.hasScoreButtons()'s (:noScoreButtons) version, every other watch the (:scoreButtons) one.
+base.excludeAnnotations = noTouchScreen;bundledFonts;glanceWindow;noScoreButtons
+descentg2.excludeAnnotations = noTouchScreen;noBundledFonts;glanceWindow;noScoreButtons
+instinct3amoled45mm.excludeAnnotations = touchScreen;noBundledFonts;noGlanceWindow;noScoreButtons
+instinct3amoled50mm.excludeAnnotations = touchScreen;noBundledFonts;noGlanceWindow;noScoreButtons
+approachs50.excludeAnnotations = noTouchScreen;noBundledFonts;glanceWindow;scoreButtons
+d2airx10.excludeAnnotations = noTouchScreen;noBundledFonts;glanceWindow;scoreButtons
+venu2.excludeAnnotations = noTouchScreen;noBundledFonts;glanceWindow;scoreButtons
+venu2plus.excludeAnnotations = noTouchScreen;noBundledFonts;glanceWindow;scoreButtons
+venu2s.excludeAnnotations = noTouchScreen;noBundledFonts;glanceWindow;scoreButtons
+venu3.excludeAnnotations = noTouchScreen;noBundledFonts;glanceWindow;scoreButtons
+venu3s.excludeAnnotations = noTouchScreen;noBundledFonts;glanceWindow;scoreButtons
+vivoactive5.excludeAnnotations = noTouchScreen;noBundledFonts;glanceWindow;scoreButtons
+approachs7042mm.excludeAnnotations = noTouchScreen;bundledFonts;glanceWindow;scoreButtons
+approachs7047mm.excludeAnnotations = noTouchScreen;bundledFonts;glanceWindow;scoreButtons
+approachs7243mm.excludeAnnotations = noTouchScreen;bundledFonts;glanceWindow;scoreButtons
+approachs7247mm.excludeAnnotations = noTouchScreen;bundledFonts;glanceWindow;scoreButtons
+venu441mm.excludeAnnotations = noTouchScreen;bundledFonts;glanceWindow;scoreButtons
+venu445mm.excludeAnnotations = noTouchScreen;bundledFonts;glanceWindow;scoreButtons
+vivoactive6.excludeAnnotations = noTouchScreen;bundledFonts;glanceWindow;scoreButtons
+
+# The bundled fonts' folder for each screen size: 360, 390 and 416 (one set), 454 px. The 390 and 416 px
+# watches added in 1.2 take 390-416-tall, the same set with the larger sizes their taller glances draw,
+# so the Descent G2's and the Instinct 3 AMOLED's builds keep 1.1's set.
+venu2s.sourcePath = $(venu2s.sourcePath);bundled-fonts/360/source
+venu2s.resourcePath = $(venu2s.resourcePath);bundled-fonts/360/resources
+approachs50.sourcePath = $(approachs50.sourcePath);bundled-fonts/390-416-tall/source
+d2airx10.sourcePath = $(d2airx10.sourcePath);bundled-fonts/390-416-tall/source
+descentg2.sourcePath = $(descentg2.sourcePath);bundled-fonts/390-416/source
+instinct3amoled45mm.sourcePath = $(instinct3amoled45mm.sourcePath);bundled-fonts/390-416/source
+instinct3amoled50mm.sourcePath = $(instinct3amoled50mm.sourcePath);bundled-fonts/390-416/source
+venu2.sourcePath = $(venu2.sourcePath);bundled-fonts/390-416-tall/source
+venu2plus.sourcePath = $(venu2plus.sourcePath);bundled-fonts/390-416-tall/source
+venu3s.sourcePath = $(venu3s.sourcePath);bundled-fonts/390-416-tall/source
+vivoactive5.sourcePath = $(vivoactive5.sourcePath);bundled-fonts/390-416-tall/source
+approachs50.resourcePath = $(approachs50.resourcePath);bundled-fonts/390-416-tall/resources
+d2airx10.resourcePath = $(d2airx10.resourcePath);bundled-fonts/390-416-tall/resources
+descentg2.resourcePath = $(descentg2.resourcePath);bundled-fonts/390-416/resources
+instinct3amoled45mm.resourcePath = $(instinct3amoled45mm.resourcePath);bundled-fonts/390-416/resources
+instinct3amoled50mm.resourcePath = $(instinct3amoled50mm.resourcePath);bundled-fonts/390-416/resources
+venu2.resourcePath = $(venu2.resourcePath);bundled-fonts/390-416-tall/resources
+venu2plus.resourcePath = $(venu2plus.resourcePath);bundled-fonts/390-416-tall/resources
+venu3s.resourcePath = $(venu3s.resourcePath);bundled-fonts/390-416-tall/resources
+vivoactive5.resourcePath = $(vivoactive5.resourcePath);bundled-fonts/390-416-tall/resources
+venu3.sourcePath = $(venu3.sourcePath);bundled-fonts/454/source
+venu3.resourcePath = $(venu3.resourcePath);bundled-fonts/454/resources

@@ -34,6 +34,7 @@ module MatchFlow {
         var flow = new WarmUpFlow(FormatStore.load(), Settings.isOutdoor(), Settings.isWarmUp(),
             getSessionManager(), getLapCommitter());
         flow.court = court;
+        InputFlags.setWarmUp(flow, InputFlags.touchOnly());
         var view = new WarmUpView(flow);
         WatchUi.pushView(view, new WarmUpDelegate(view), WatchUi.SLIDE_LEFT);
     }
@@ -99,12 +100,20 @@ module MatchFlow {
     // START, the session just paused: the pause menu (MatchMenus). BACK there leaves the
     // timer stopped.
     function openPauseMenu(match as CurrentMatch) as Void {
-        MatchMenus.openPause(new MatchMenuRules(match, getSessionManager()));
+        MatchMenus.openPause(menuRules(match));
     }
 
-    // Hold UP: the match menu (MatchMenus), the timer running (or still stopped, paused).
+    // Hold UP: the match menu (MatchMenus), the timer running (or still stopped, paused). A swipe up on
+    // the watches without UP and DOWN, and their own menu key.
     function openMatchMenu(match as CurrentMatch) as Void {
-        MatchMenus.openMatch(new MatchMenuRules(match, getSessionManager()));
+        MatchMenus.openMatch(menuRules(match));
+    }
+
+    // The menus' rules, with this watch's flags (InputFlags).
+    function menuRules(match as CurrentMatch) as MatchMenuRules {
+        var rules = new MatchMenuRules(match, getSessionManager());
+        InputFlags.setMenus(rules, InputFlags.touchOnly(), InputFlags.hasTones());
+        return rules;
     }
 
     // Data page or Stats page in the match menu (closed first): page, the data page or the stats page,
@@ -131,6 +140,7 @@ module MatchFlow {
         var model = new SummaryModel(record);
         var view = new SummaryView(model, true);
         var input = new SummaryInput(match, getSessionManager(), model.getPageCount());
+        InputFlags.setSummary(input, InputFlags.touchOnly());
         WatchUi.switchToView(view, new SummaryDelegate(view, input, match), WatchUi.SLIDE_UP);
         _score = null;
         _record = record;

@@ -243,6 +243,49 @@ function matchMenuTouchScreenTest(logger as Logger) as Boolean {
 }
 
 (:test)
+function matchMenuTouchGestureTest(logger as Logger) as Boolean {
+    // On the watches without UP and DOWN (the flags on): the match menu's items that log nothing come first
+    // (Data page, Stats page, Vibration, Sounds, Touch scoring), then those that log an event (Swap our
+    // servers, Fix serving team, Deuce mode, Edit score), so a stray tap after a stray swipe up changes
+    // nothing; Touch scoring shows the gesture under it, Tap or Hold, as stored. Where the watch has no
+    // tones, Sounds is left out. The pause menu keeps its items. Off, the order and the values are 1.1's
+    // (matchMenuItemsTest, matchMenuLabelsTest).
+    var rig = new TestKit.Rig(new MatchConfig(), "", false);
+    var rules = rig.rules;
+    var pause = rules.getPauseItems(TestKit.MENU_TIME).toString();
+    Test.assert(!rules.eventsLast && !rules.gestureItem && !rules.noSounds && rules.getValue(ITEM_TOUCH_SCORING) == null);
+    rules.eventsLast = true;
+    rules.gestureItem = true;
+    TestKit.assertItems(rules.getMatchItems(), [ITEM_DATA_PAGE, ITEM_STATS_PAGE, ITEM_VIBRATION, ITEM_SOUNDS, ITEM_TOUCH_SCORING,
+        ITEM_SWAP_SERVER, ITEM_FIX_SERVING_TEAM, ITEM_DEUCE_MODE, ITEM_EDIT_SCORE], "events last");
+    Test.assertEqual(rules.getPauseItems(TestKit.MENU_TIME).toString(), pause);
+    rules.noSounds = true;
+    TestKit.assertItems(rules.getMatchItems(), [ITEM_DATA_PAGE, ITEM_STATS_PAGE, ITEM_VIBRATION, ITEM_TOUCH_SCORING,
+        ITEM_SWAP_SERVER, ITEM_FIX_SERVING_TEAM, ITEM_DEUCE_MODE, ITEM_EDIT_SCORE], "no tones");
+    Test.assert(rules.endMatch(TestKit.MENU_TIME));
+    TestKit.assertItems(rules.getMatchItems(), [ITEM_DATA_PAGE, ITEM_STATS_PAGE, ITEM_VIBRATION, ITEM_TOUCH_SCORING],
+        "match over, no tones");
+    rules.eventsLast = false;
+    TestKit.assertItems(rules.getMatchItems(), [ITEM_DATA_PAGE, ITEM_STATS_PAGE, ITEM_VIBRATION, ITEM_TOUCH_SCORING],
+        "match over, no tones, 1.1's order");
+    // The gesture under Touch scoring, read from the setting each time.
+    var saved = Settings.read(Settings.TOUCH_GESTURE);
+    try {
+        Settings.setTouchGesture(GESTURE_HOLD);
+        Test.assert(rules.getValue(ITEM_TOUCH_SCORING) == Rez.Strings.GestureHold);
+        Settings.setTouchGesture(GESTURE_TAP);
+        Test.assert(rules.getValue(ITEM_TOUCH_SCORING) == Rez.Strings.GestureTap);
+        rules.gestureItem = false;
+        Test.assert(rules.getValue(ITEM_TOUCH_SCORING) == null);
+    } finally {
+        Settings.write(Settings.TOUCH_GESTURE, saved as Number);
+    }
+    Test.assert(MatchMenuRules.gestureName(GESTURE_TAP) == Rez.Strings.GestureTap
+        && MatchMenuRules.gestureName(GESTURE_HOLD) == Rez.Strings.GestureHold);
+    return true;
+}
+
+(:test)
 module MatchMenuTests {
 
     // Once the match is over: Resume, Save, Discard and Settings when paused; Data page, Stats page,

@@ -1,0 +1,76 @@
+<fonts>
+    <font id="B8" filename="B8.fnt" antialias="true" scope="glance"/>
+    <font id="B9" filename="B9.fnt" antialias="true" scope="glance"/>
+    <font id="B10" filename="B10.fnt" antialias="true" scope="glance"/>
+    <font id="B11" filename="B11.fnt" antialias="true" scope="glance"/>
+    <font id="B12" filename="B12.fnt" antialias="true" scope="glance"/>
+    <font id="B13" filename="B13.fnt" antialias="true" scope="glance"/>
+    <font id="B14" filename="B14.fnt" antialias="true" scope="glance"/>
+    <font id="B15" filename="B15.fnt" antialias="true" scope="glance"/>
+    <font id="B16" filename="B16.fnt" antialias="true" scope="glance"/>
+    <font id="B17" filename="B17.fnt" antialias="true" scope="glance"/>
+    <font id="B18" filename="B18.fnt" antialias="true" scope="glance"/>
+    <font id="B19" filename="B19.fnt" antialias="true" scope="glance"/>
+    <font id="B20" filename="B20.fnt" antialias="true" scope="glance"/>
+    <font id="B21" filename="B21.fnt" antialias="true" scope="glance"/>
+    <font id="B22" filename="B22.fnt" antialias="true" scope="glance"/>
+    <font id="B23" filename="B23.fnt" antialias="true" scope="glance"/>
+    <font id="R8" filename="R8.fnt" antialias="true"/>
+    <font id="R9" filename="R9.fnt" antialias="true"/>
+    <font id="R10" filename="R10.fnt" antialias="true"/>
+    <font id="R11" filename="R11.fnt" antialias="true"/>
+    <font id="R12" filename="R12.fnt" antialias="true"/>
+    <font id="R13" filename="R13.fnt" antialias="true"/>
+    <font id="R14" filename="R14.fnt" antialias="true"/>
+    <font id="R15" filename="R15.fnt" antialias="true"/>
+    <font id="R16" filename="R16.fnt" antialias="true"/>
+    <font id="R17" filename="R17.fnt" antialias="true"/>
+    <font id="R18" filename="R18.fnt" antialias="true"/>
+    <font id="R19" filename="R19.fnt" antialias="true"/>
+    <font id="R20" filename="R20.fnt" antialias="true"/>
+    <font id="R21" filename="R21.fnt" antialias="true"/>
+    <font id="R22" filename="R22.fnt" antialias="true"/>
+    <font id="BC23" filename="BC23.fnt" antialias="true"/>
+    <font id="BC24" filename="BC24.fnt" antialias="true"/>
+    <font id="BC25" filename="BC25.fnt" antialias="true"/>
+    <font id="BC26" filename="BC26.fnt" antialias="true"/>
+    <font id="BC27" filename="BC27.fnt" antialias="true"/>
+    <font id="BC28" filename="BC28.fnt" antialias="true"/>
+    <font id="BC38" filename="BC38.fnt" antialias="true"/>
+    <font id="BC90" filename="BC90.fnt" antialias="true"/>
+    <font id="BC104" filename="BC104.fnt" antialias="true"/>
+    <font id="RC23" filename="RC23.fnt" antialias="true"/>
+    <font id="RC24" filename="RC24.fnt" antialias="true"/>
+    <font id="RC25" filename="RC25.fnt" antialias="true"/>
+    <font id="RC26" filename="RC26.fnt" antialias="true"/>
+    <font id="RC27" filename="RC27.fnt" antialias="true"/>
+    <font id="RC28" filename="RC28.fnt" antialias="true"/>
+    <font id="N8" filename="N8.fnt" antialias="true"/>
+    <font id="N9" filename="N9.fnt" antialias="true"/>
+    <font id="N10" filename="N10.fnt" antialias="true"/>
+    <font id="N11" filename="N11.fnt" antialias="true"/>
+    <font id="N12" filename="N12.fnt" antialias="true"/>
+    <font id="N13" filename="N13.fnt" antialias="true"/>
+    <font id="N14" filename="N14.fnt" antialias="true"/>
+    <font id="N15" filename="N15.fnt" antialias="true"/>
+    <font id="N16" filename="N16.fnt" antialias="true"/>
+    <font id="N17" filename="N17.fnt" antialias="true"/>
+    <font id="N18" filename="N18.fnt" antialias="true"/>
+    <font id="N19" filename="N19.fnt" antialias="true"/>
+    <font id="N20" filename="N20.fnt" antialias="true"/>
+    <font id="N21" filename="N21.fnt" antialias="true"/>
+    <font id="N22" filename="N22.fnt" antialias="true"/>
+    <font id="N23" filename="N23.fnt" antialias="true"/>
+    <font id="N24" filename="N24.fnt" antialias="true"/>
+    <font id="N25" filename="N25.fnt" antialias="true"/>
+    <font id="N26" filename="N26.fnt" antialias="true"/>
+    <font id="N27" filename="N27.fnt" antialias="true"/>
+    <font id="N28" filename="N28.fnt" antialias="true"/>
+    <font id="N40" filename="N40.fnt" antialias="true"/>
+    <font id="N42" filename="N42.fnt" antialias="true"/>
+    <font id="N48" filename="N48.fnt" antialias="true"/>
+    <font id="N55" filename="N55.fnt" antialias="true"/>
+    <font id="N83" filename="N83.fnt" antialias="true"/>
+    <font id="N104" filename="N104.fnt" antialias="true"/>
+    <font id="T37" filename="T37.fnt" antialias="true" scope="glance"/>
+</fonts>

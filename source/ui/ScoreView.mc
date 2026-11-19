@@ -165,6 +165,7 @@ class ScoreView extends WatchUi.View {
     function initialize(match as CurrentMatch) {
         View.initialize();
         _match = match;
+        InputFlags.setMotion(_motion, InputFlags.touchOnly());
     }
 
     function onLayout(dc as Dc) as Void {
